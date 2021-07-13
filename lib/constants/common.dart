@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 class SongTile extends StatelessWidget {
@@ -31,8 +33,8 @@ class SongTile extends StatelessWidget {
             ),
             child: Icon(Icons.music_note),
           ),
-          title: Text(songTitle),
-          subtitle: Text(artist),
+          title: Text(songTitle, overflow: TextOverflow.ellipsis),
+          subtitle: Text(artist, overflow: TextOverflow.ellipsis),
           trailing: Text(timestamp),
         ),
       ),
@@ -46,21 +48,30 @@ Widget playArrow = Image.asset(
   color: Colors.black,
 );
 
-AppBar appBAr(BuildContext context, String title, Widget trailing) {
+Widget backbutton(BuildContext context) {
+  return IconButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    highlightColor: Colors.transparent,
+    splashColor: Colors.transparent,
+    icon: Icon(Icons.arrow_back),
+    color: Colors.black,
+  );
+}
+
+AppBar appBAr(
+  BuildContext context,
+  String title,
+  Widget trailing,
+  Widget leadingIcon,
+) {
   return AppBar(
     centerTitle: true,
     automaticallyImplyLeading: false,
     backgroundColor: Colors.transparent,
     elevation: 0,
-    leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      highlightColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      icon: Icon(Icons.arrow_back),
-      color: Colors.black,
-    ),
+    leading: leadingIcon,
     title: Text(
       title,
       style: TextStyle(color: Colors.black),
@@ -70,4 +81,51 @@ AppBar appBAr(BuildContext context, String title, Widget trailing) {
       SizedBox(width: 20),
     ],
   );
+}
+
+class CustomField extends StatelessWidget {
+  final Function(void) onchange;
+
+  const CustomField({
+    Key? key,
+    required this.onchange,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onChanged: onchange,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        disabledBorder: InputBorder.none,
+        suffixIcon: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.search,
+              color: Colors.white,
+              size: 25,
+            ),
+          ),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.only(left: 20),
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        hintText: 'Search',
+        hintStyle: TextStyle(
+          fontSize: 17,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
 }
