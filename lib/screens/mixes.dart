@@ -10,10 +10,8 @@ class Mixes extends StatelessWidget {
       appBar: appBAr(
         context,
         'Mixes',
-        Icon(
-          Icons.sort,
-          color: Colors.black,
-        ),
+        Icon(Icons.sort, color: Colors.black),
+        backbutton(context),
       ),
     );
   }
