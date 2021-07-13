@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
+import 'package:music_streaming/screens/lyrics_screen.dart';
 
 class NowPlaying extends StatefulWidget {
   const NowPlaying({Key? key}) : super(key: key);
@@ -12,65 +13,79 @@ class NowPlaying extends StatefulWidget {
 
 class _NowPlayingState extends State<NowPlaying> {
   double value = 30;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBAr(
         context,
         'Now Playing',
-        Icon(
-          Icons.sort,
-          color: Colors.black,
+        IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.keyboard_arrow_down, color: Colors.black),
         ),
+        SizedBox(),
       ),
       body: Column(
         children: [
-          Container(
-            height: 280,
-            padding: EdgeInsets.only(bottom: 20, left: 20),
-            alignment: Alignment.bottomLeft,
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text('Lyrics'),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Forest Hills Drive - Jcole',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Love Yours',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
-          SizedBox(height: 50),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
             children: [
-              Image.asset('images/skip_previous.png', width: 20),
               Container(
-                height: 100,
-                width: 100,
+                height: 280,
+                padding: EdgeInsets.only(bottom: 20, left: 20),
+                alignment: Alignment.bottomLeft,
+                width: double.infinity,
+                margin: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: 50,
+                child: GestureDetector(
+                  onTap: () {
+                    showCupertinoModalBottomSheet(
+                      context: context,
+                      builder: (context) => Lyrics(),
+                    );
+                  },
+                  child: Text('Lyrics'),
                 ),
               ),
-              Image.asset('images/skip_next.png', width: 20),
+              SizedBox(height: 10),
+              Text(
+                'Forest Hills Drive - Jcole',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Love Yours',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+              SizedBox(height: 50),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Image.asset('images/skip_previous.png', width: 20),
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      size: 50,
+                    ),
+                  ),
+                  Image.asset('images/skip_next.png', width: 20),
+                ],
+              ),
             ],
           ),
           Spacer(),
@@ -87,9 +102,7 @@ class _NowPlayingState extends State<NowPlaying> {
                   onPressed: () {
                     showCupertinoModalBottomSheet(
                       context: context,
-                      builder: (context) {
-                        return AlbumSongs();
-                      },
+                      builder: (context) => AlbumSongs(),
                     );
                   },
                   icon: Icon(Icons.menu),

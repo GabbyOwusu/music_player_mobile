@@ -32,6 +32,14 @@ class Home extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                offset: Offset(0, 30),
+                blurRadius: 30,
+                spreadRadius: -15,
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:music_streaming/now_playing.dart';
-import 'package:music_streaming/screens/albums/album_screen.dart';
-import 'package:music_streaming/screens/home/home.dart';
-import 'package:music_streaming/screens/home/home_tabs.dart';
-import 'package:music_streaming/screens/songs/song_screen.dart';
+import 'package:music_streaming/screens/now_playing.dart';
+import 'package:music_streaming/screens/search.dart';
+import 'package:music_streaming/screens/tabs/Albums/album_screen.dart';
+import 'package:music_streaming/screens/tabs/Home/home_tabs.dart';
+import 'package:music_streaming/screens/tabs/Home/home.dart';
+import 'package:music_streaming/screens/tabs/Songs/song_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({
@@ -49,9 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   Container(
-                    margin: EdgeInsets.only(right: 10),
-                    height: 50,
-                    width: 50,
+                    margin: EdgeInsets.only(right: 20, left: 10),
+                    height: 40,
+                    width: 40,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 2),
                       shape: BoxShape.circle,
@@ -75,9 +76,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   shape: BoxShape.circle,
                   color: Colors.grey[100],
                 ),
-                child: Icon(
-                  CupertinoIcons.rocket,
-                  color: Colors.black,
+                child: IconButton(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  focusColor: Colors.transparent,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Search(),
+                      ),
+                    );
+                  },
+                  icon: Image.asset('images/search.png', width: 20),
                 ),
               ),
             ],
@@ -112,14 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomSheet: GestureDetector(
         onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) {
-          //       return NowPlaying();
-          //     },
-          //   ),
-          // );
           showCupertinoModalBottomSheet(
               context: context,
               builder: (context) {
@@ -129,7 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           height: 120,
           width: double.infinity,
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -153,8 +158,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   top: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.1),
+                      offset: Offset(0, 10),
+                      blurRadius: 50,
+                      spreadRadius: 10,
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [

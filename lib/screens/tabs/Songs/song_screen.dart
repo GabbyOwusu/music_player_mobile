@@ -18,7 +18,7 @@ class _SongsState extends State<Songs> {
           ...List.generate(5, (index) {
             return SongTile(
               songTitle: 'Bebo',
-              artist: 'Burna boy, Lexus , Joey B ',
+              artist: 'Burna boy, Lexus , Joey B , Joey B ,Joey B ',
               timestamp: '4:30',
               onTap: () {},
             );
