@@ -31,6 +31,7 @@ dependencies:
   provider:
   modal_bottom_sheet: 
   flutter_audio_query: 
+  on_audio_query: 
 
 dev_dependencies:
   flutter_test:
