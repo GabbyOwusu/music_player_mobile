@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
+import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
+import 'package:provider/provider.dart';
 
 class NowPlaying extends StatefulWidget {
   const NowPlaying({Key? key}) : super(key: key);
@@ -13,6 +15,9 @@ class NowPlaying extends StatefulWidget {
 
 class _NowPlayingState extends State<NowPlaying> {
   double value = 30;
+  SongProvider get provider {
+    return Provider.of<SongProvider>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +107,7 @@ class _NowPlayingState extends State<NowPlaying> {
                   onPressed: () {
                     showCupertinoModalBottomSheet(
                       context: context,
-                      builder: (context) => AlbumSongs(),
+                      builder: (context) => AlbumSongs(p: provider),
                     );
                   },
                   icon: Icon(Icons.menu),
@@ -148,9 +153,9 @@ class _NowPlayingState extends State<NowPlaying> {
 }
 
 class AlbumSongs extends StatelessWidget {
-  const AlbumSongs({
-    Key? key,
-  }) : super(key: key);
+  const AlbumSongs({Key? key, required this.p}) : super(key: key);
+
+  final SongProvider p;
 
   @override
   Widget build(BuildContext context) {
@@ -211,9 +216,8 @@ class AlbumSongs extends StatelessWidget {
               SizedBox(height: 30),
               ...List.generate(20, (index) {
                 return SongTile(
-                  songTitle: 'Bebo',
-                  artist: 'Burna boy, Lexus , Joey B ',
-                  timestamp: '4:30',
+                  index: index,
+                  songInfo: p.songs[index],
                   onTap: () {},
                 );
               })
