@@ -1,25 +1,27 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
-class SongTile extends StatelessWidget {
+class SongTile extends StatefulWidget {
+  final SongModel songInfo;
+  final Function() onTap;
+  final int index;
+
   const SongTile({
     Key? key,
-    required this.songTitle,
-    required this.artist,
-    required this.timestamp,
+    required this.index,
     required this.onTap,
+    required this.songInfo,
   }) : super(key: key);
 
-  final String songTitle;
-  final String artist;
-  final String timestamp;
-  final VoidCallback onTap;
+  @override
+  _SongTileState createState() => _SongTileState();
+}
 
+class _SongTileState extends State<SongTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         alignment: Alignment.center,
         margin: EdgeInsets.only(bottom: 10),
@@ -31,15 +33,69 @@ class SongTile extends StatelessWidget {
               color: Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.music_note),
+            child: widget.songInfo.artwork == null
+                ? Icon(Icons.music_note)
+                : Art(
+                    index: widget.index,
+                    type: ArtworkType.AUDIO,
+                    songInfo: widget.songInfo,
+                  ),
           ),
-          title: Text(songTitle, overflow: TextOverflow.ellipsis),
-          subtitle: Text(artist, overflow: TextOverflow.ellipsis),
-          trailing: Text(timestamp),
+          title: Text(widget.songInfo.title, overflow: TextOverflow.ellipsis),
+          subtitle: Text(
+            widget.songInfo.artist,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(
+            '${parseToMinutesSeconds(
+              int.parse(widget.songInfo.duration.toString()),
+            )}',
+          ),
         ),
       ),
     );
   }
+}
+
+class Art extends StatefulWidget {
+  const Art({
+    Key? key,
+    required this.index,
+    required this.type,
+    required this.songInfo,
+  }) : super(key: key);
+
+  final int index;
+  final ArtworkType type;
+  final SongModel songInfo;
+
+  @override
+  _ArtState createState() => _ArtState();
+}
+
+class _ArtState extends State<Art> {
+  @override
+  Widget build(BuildContext context) {
+    return QueryArtworkWidget(
+      artworkFit: BoxFit.fill,
+      artworkBorder: BorderRadius.circular(12),
+      id: widget.index,
+      type: widget.type,
+      artwork: widget.songInfo.artwork,
+      deviceSDK: 10,
+    );
+  }
+}
+
+String parseToMinutesSeconds(int ms) {
+  String data;
+  Duration duration = Duration(milliseconds: ms);
+  int minutes = duration.inMinutes;
+  int seconds = (duration.inSeconds) - (minutes * 60);
+  data = minutes.toString() + ":";
+  if (seconds <= 9) data += "0";
+  data += seconds.toString();
+  return data;
 }
 
 Widget playArrow = Image.asset(
