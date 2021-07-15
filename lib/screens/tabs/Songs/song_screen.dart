@@ -4,7 +4,7 @@ import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:provider/provider.dart';
 
 class Songs extends StatefulWidget {
-  const Songs({Key? key}) : super(key: key);
+  const Songs({Key key}) : super(key: key);
 
   @override
   _SongsState createState() => _SongsState();
@@ -12,7 +12,7 @@ class Songs extends StatefulWidget {
 
 class _SongsState extends State<Songs> {
   SongProvider get p {
-    return Provider.of<SongProvider>(context);
+    return Provider.of<SongProvider>(context, listen: false);
   }
 
   @override
@@ -20,15 +20,38 @@ class _SongsState extends State<Songs> {
     context.watch<SongProvider>().songs;
     return p.songs.length > 0
         ? Padding(
-            padding: const EdgeInsets.only(left: 10, top: 30, right: 30),
+            padding: const EdgeInsets.only(left: 10, top: 10, right: 30),
             child: Column(
               children: [
-                ...List.generate(
-                  p.songs.length,
-                  (index) => SongTile(
-                    index: index,
-                    songInfo: p.songs[index],
-                    onTap: () {},
+                // ...List.generate(
+                //     p.songs.length,
+                //     (index) => SongTile(
+                //         index: index,
+                //         songInfo: p.songs[index],
+                //         onTap: () {
+                //           setState(() {
+                //             p.addNowplaying(p.songs[index]);
+                //             print(p.playing);
+                //           });
+                //         })),
+                Container(
+                  height: 700,
+                  child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: p.songs.length,
+                    itemBuilder: (context, index) {
+                      return SongTile(
+                        index: index,
+                        songInfo: p.songs[index],
+                        onTap: () {
+                          setState(() {
+                            p.addNowplaying(p.songs[index]);
+                            print(p.playing);
+                          });
+                        },
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: 150),
