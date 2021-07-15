@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:flutter_audio_query/flutter_audio_query.dart';
 
 class SongTile extends StatefulWidget {
-  final SongModel songInfo;
+  final SongInfo songInfo;
   final Function() onTap;
   final int index;
 
   const SongTile({
-    Key? key,
-    required this.index,
-    required this.onTap,
-    required this.songInfo,
+    Key key,
+    @required this.index,
+    @required this.onTap,
+    @required this.songInfo,
   }) : super(key: key);
 
   @override
@@ -33,13 +33,7 @@ class _SongTileState extends State<SongTile> {
               color: Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: widget.songInfo.artwork == null
-                ? Icon(Icons.music_note)
-                : Art(
-                    index: widget.index,
-                    type: ArtworkType.AUDIO,
-                    songInfo: widget.songInfo,
-                  ),
+            child: Icon(Icons.music_note),
           ),
           title: Text(widget.songInfo.title, overflow: TextOverflow.ellipsis),
           subtitle: Text(
@@ -57,35 +51,34 @@ class _SongTileState extends State<SongTile> {
   }
 }
 
-class Art extends StatefulWidget {
-  const Art({
-    Key? key,
-    required this.index,
-    required this.type,
-    required this.songInfo,
-  }) : super(key: key);
+// class Art extends StatelessWidget {
+//   const Art({
+//     Key? key,
+//     required this.index,
+//     required this.type,
+//     required this.art,
+//     this.radius,
+//     this.fit,
+//   });
 
-  final int index;
-  final ArtworkType type;
-  final SongModel songInfo;
+//   final int? index;
+//   final ArtworkType type;
+//   final String? art;
+//   final BoxFit? fit;
+//   final BorderRadius? radius;
 
-  @override
-  _ArtState createState() => _ArtState();
-}
-
-class _ArtState extends State<Art> {
-  @override
-  Widget build(BuildContext context) {
-    return QueryArtworkWidget(
-      artworkFit: BoxFit.fill,
-      artworkBorder: BorderRadius.circular(12),
-      id: widget.index,
-      type: widget.type,
-      artwork: widget.songInfo.artwork,
-      deviceSDK: 10,
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return QueryArtworkWidget(
+//       artworkFit: fit,
+//       artworkBorder: radius ?? BorderRadius.circular(12),
+//       id: index ?? 0,
+//       type: type,
+//       artwork: art,
+//       deviceSDK: 9,
+//     );
+//   }
+// }
 
 String parseToMinutesSeconds(int ms) {
   String data;
@@ -143,8 +136,8 @@ class CustomField extends StatelessWidget {
   final Function(void) onchange;
 
   const CustomField({
-    Key? key,
-    required this.onchange,
+    Key key,
+    @required this.onchange,
   }) : super(key: key);
 
   @override
