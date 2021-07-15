@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class HomeTabs extends StatelessWidget {
   const HomeTabs({
-    Key? key,
-    required this.tabs,
-    required this.currentIndex,
-    required this.index,
-    required this.ontapped,
+    Key key,
+    @required this.tabs,
+    @required this.currentIndex,
+    @required this.index,
+    @required this.ontapped,
   }) : super(key: key);
 
   final List<String> tabs;
