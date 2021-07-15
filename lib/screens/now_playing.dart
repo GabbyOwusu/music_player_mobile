@@ -4,10 +4,11 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
+
 import 'package:provider/provider.dart';
 
 class NowPlaying extends StatefulWidget {
-  const NowPlaying({Key? key}) : super(key: key);
+  const NowPlaying({Key key}) : super(key: key);
 
   @override
   _NowPlayingState createState() => _NowPlayingState();
@@ -34,12 +35,13 @@ class _NowPlayingState extends State<NowPlaying> {
       body: Column(
         children: [
           Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 height: 280,
-                padding: EdgeInsets.only(bottom: 20, left: 20),
-                alignment: Alignment.bottomLeft,
                 width: double.infinity,
+                alignment: Alignment.bottomLeft,
+                padding: EdgeInsets.only(left: 20, bottom: 20),
                 margin: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
@@ -57,18 +59,23 @@ class _NowPlayingState extends State<NowPlaying> {
               ),
               SizedBox(height: 10),
               Text(
-                'Forest Hills Drive - Jcole',
+                provider.playing.artist,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
                 ),
               ),
               SizedBox(height: 10),
-              Text(
-                'Love Yours',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  provider.playing.title,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
                 ),
               ),
               SizedBox(height: 50),
@@ -153,7 +160,7 @@ class _NowPlayingState extends State<NowPlaying> {
 }
 
 class AlbumSongs extends StatelessWidget {
-  const AlbumSongs({Key? key, required this.p}) : super(key: key);
+  const AlbumSongs({Key key, @required this.p}) : super(key: key);
 
   final SongProvider p;
 
