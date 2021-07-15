@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/common.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+  const Search({Key key}) : super(key: key);
 
   @override
   _SearchState createState() => _SearchState();

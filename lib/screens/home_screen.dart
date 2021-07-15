@@ -1,16 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/now_playing.dart';
 import 'package:music_streaming/screens/search.dart';
-import 'package:music_streaming/screens/tabs/Albums/album_screen.dart';
+import 'package:music_streaming/screens/tabs/Albums/albums.dart';
+import 'package:music_streaming/screens/tabs/Artists/artists.dart';
 import 'package:music_streaming/screens/tabs/Home/home_tabs.dart';
 import 'package:music_streaming/screens/tabs/Home/home.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_screen.dart';
 
+import 'package:provider/provider.dart';
+
 class HomeScreen extends StatefulWidget {
   HomeScreen({
-    Key? key,
+    Key key,
   }) : super(key: key);
 
   @override
@@ -24,15 +29,19 @@ class _HomeScreenState extends State<HomeScreen> {
     'Home',
     'Songs',
     'Albums',
-    'Playlists',
+    'Artists',
   ];
 
   final tabs = [
     Home(),
     Songs(),
     Albums(),
-    Songs(),
+    Artists(),
   ];
+
+  SongProvider get provider {
+    return Provider.of<SongProvider>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,38 +180,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
                       margin: EdgeInsets.only(left: 10),
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
-                        color: Colors.grey,
+                        color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      child: Icon(Icons.music_note),
                     ),
-                    Spacer(),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Forest Hills Drive - Jcole',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
-                          ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              provider.playing?.artist ?? 'No media',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                              ),
+                            ),
+                            SizedBox(height: 03),
+                            Text(
+                              // '${provider.playing.fileParent}/${provider.playing.title}',
+                              provider.playing?.title ?? 'No media',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 5),
-                        Text(
-                          'Love Yours',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        )
-                      ],
+                      ),
                     ),
-                    Spacer(),
                     Image.asset(
                       'images/play.png',
                       color: Colors.black,

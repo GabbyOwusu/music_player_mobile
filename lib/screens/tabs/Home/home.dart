@@ -4,7 +4,7 @@ import 'package:music_streaming/screens/mixes.dart';
 
 class Home extends StatelessWidget {
   const Home({
-    Key? key,
+    Key key,
   }) : super(key: key);
 
   @override
@@ -81,7 +81,7 @@ class Home extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                'Mixes',
+                'Playlists',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 17,

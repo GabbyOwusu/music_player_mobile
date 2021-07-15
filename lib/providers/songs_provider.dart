@@ -1,30 +1,55 @@
+import 'package:flutter_audio_query/flutter_audio_query.dart';
 import 'package:music_streaming/providers/base_provider.dart';
-import 'package:music_streaming/services/file_service.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 
 class SongProvider extends Baseprovider {
-  OnAudioQuery audioQuery = OnAudioQuery();
+  FlutterAudioQuery audioQuery = FlutterAudioQuery();
 
-  List<SongModel> _songList = [];
+  List<SongInfo> _songList = [];
+  List<AlbumInfo> _albumList = [];
+  List<SongInfo> _albumSongs = [];
 
-  List<SongModel> get songs => _songList;
+  SongInfo _nowPlaying;
+
+  List<SongInfo> get songs => _songList;
+  List<AlbumInfo> get albums => _albumList;
+  List<SongInfo> get albumSongs => _albumSongs;
+  SongInfo get playing => _nowPlaying;
+
+  void addNowplaying(SongInfo song) {
+    _nowPlaying = song;
+    notifyListeners();
+  }
 
   Future<void> getSongs() async {
     try {
-      List<SongModel> songList = await audioQuery.querySongs(
-        SongSortType.DATA_ADDED,
-        OrderType.ASC_OR_SMALLER,
-        UriType.EXTERNAL,
-        true,
-      );
+      List<SongInfo> songList = await audioQuery.getSongs();
       _songList = songList;
-
-      print(
-        'There are ${_songList.length} number of songs on the device.\nThe list of all songs on device ......$_songList',
-      );
     } catch (e) {
       print('Error happened becuase $e');
     }
     notifyListeners();
+  }
+
+  Future<void> getAlbums() async {
+    try {
+      List<AlbumInfo> albumList = await audioQuery.getAlbums();
+      _albumList = albumList;
+      print('Albums on device ${_albumList.length} \n$_albumList');
+    } catch (e) {
+      print('Error happened becuase $e');
+    }
+    notifyListeners();
+  }
+
+  Future getalbumSongs(String id) async {
+    try {
+      List<SongInfo> songs = await audioQuery.getSongsFromAlbum(
+        albumId: id,
+      );
+      _albumSongs = songs;
+      print(_albumSongs);
+    } catch (e) {
+      print('Error getting album songs becuase ....$e');
+    }
   }
 }

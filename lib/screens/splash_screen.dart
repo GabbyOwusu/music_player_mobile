@@ -46,6 +46,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     p.getSongs();
+    p.getAlbums();
     Future.delayed(
       Duration(milliseconds: 500),
       () {
