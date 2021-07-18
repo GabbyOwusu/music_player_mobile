@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
 import 'package:music_streaming/constants/common.dart';
@@ -72,8 +74,15 @@ class _AlbumScreenState extends State<AlbumScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey,
+                      image: DecorationImage(
+                        image: widget.info?.albumArt == null
+                            ? AssetImage('images/music_note.png')
+                            : FileImage(File(widget.info.albumArt)),
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
-                    child: widget.coverArt,
+
+                    // child: widget.coverArt,
                   ),
                 ),
               ),
@@ -145,6 +154,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                               int.parse(
                                   widget.provider.albumSongs[index].duration),
                             )}',
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ),
                       ),
