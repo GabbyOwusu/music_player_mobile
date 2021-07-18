@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/screens/mixes.dart';
+import 'package:music_streaming/screens/playlists.dart';
 
 class Home extends StatelessWidget {
   const Home({
@@ -90,9 +90,14 @@ class Home extends StatelessWidget {
               Spacer(),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return Mixes();
-                  }));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Playlist();
+                      },
+                    ),
+                  );
                 },
                 child: Image.asset(
                   'images/arrow.png',
