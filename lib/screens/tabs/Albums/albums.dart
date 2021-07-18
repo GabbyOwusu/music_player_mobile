@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Albums/album_screen.dart';
@@ -17,7 +19,8 @@ class _AlbumsState extends State<Albums> {
 
   @override
   Widget build(BuildContext context) {
-    return provider.albumSongs.length > 0
+    context.watch<SongProvider>().albums;
+    return provider.albumSongs.length != null
         ? Padding(
             padding: const EdgeInsets.only(
               left: 30,
@@ -48,7 +51,11 @@ class _AlbumsState extends State<Albums> {
                               index: index,
                               provider: provider,
                               info: provider.albums[index],
-                              coverArt: Icon(Icons.music_note),
+                              coverArt: provider.albums[index]?.albumArt == null
+                                  ? Image.asset('images/music_note.png')
+                                  : Image.file(
+                                      File(provider.albums[index].albumArt),
+                                    ),
                             );
                           },
                         ),
@@ -63,8 +70,19 @@ class _AlbumsState extends State<Albums> {
                           decoration: BoxDecoration(
                             color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(8),
+                            image: DecorationImage(
+                              image: provider.albums[index].albumArt == null
+                                  ? AssetImage('images/music_note.png')
+                                  : FileImage(
+                                      File(provider.albums[index].albumArt),
+                                    ),
+                              fit: BoxFit.fitHeight,
+                            ),
                           ),
-                          child: Icon(Icons.music_note),
+                          // child: Image.file(
+                          //   File(provider.albums[index].albumArt),
+                          //   fit: BoxFit.fitHeight,
+                          // ),
                         ),
                         SizedBox(height: 5),
                         Text(
