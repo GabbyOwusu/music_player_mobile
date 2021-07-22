@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -38,7 +40,7 @@ class _NowPlayingState extends State<NowPlaying> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                height: 280,
+                height: 300,
                 width: double.infinity,
                 alignment: Alignment.bottomLeft,
                 padding: EdgeInsets.only(left: 20, bottom: 20),
@@ -46,6 +48,16 @@ class _NowPlayingState extends State<NowPlaying> {
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(20),
+                  image: DecorationImage(
+                    image: provider.playing?.albumArtwork == null
+                        ? AssetImage('images/music_note.png')
+                        : FileImage(
+                            File(provider.playing.albumArtwork),
+                          ),
+                    fit: provider.playing?.albumArtwork == null
+                        ? BoxFit.contain
+                        : BoxFit.fitWidth,
+                  ),
                 ),
                 child: GestureDetector(
                   onTap: () {
@@ -59,7 +71,7 @@ class _NowPlayingState extends State<NowPlaying> {
               ),
               SizedBox(height: 10),
               Text(
-                provider.playing.artist,
+                provider.playing?.artist ?? '<Unknown>',
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.grey,
@@ -70,7 +82,7 @@ class _NowPlayingState extends State<NowPlaying> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  provider.playing.title,
+                  provider.playing?.title ?? '<Unknown>',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
@@ -114,7 +126,9 @@ class _NowPlayingState extends State<NowPlaying> {
                   onPressed: () {
                     showCupertinoModalBottomSheet(
                       context: context,
-                      builder: (context) => AlbumSongs(p: provider),
+                      builder: (context) => AlbumSongs(
+                        p: provider,
+                      ),
                     );
                   },
                   icon: Icon(Icons.menu),
@@ -223,6 +237,10 @@ class AlbumSongs extends StatelessWidget {
               SizedBox(height: 30),
               ...List.generate(20, (index) {
                 return SongTile(
+                  coverArt: FileImage(
+                    File(p.songs[index].albumArtwork),
+                  ),
+                  provider: p,
                   index: index,
                   songInfo: p.songs[index],
                   onTap: () {},

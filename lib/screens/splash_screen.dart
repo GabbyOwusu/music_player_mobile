@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
-import 'package:music_streaming/screens/home_screen.dart';
+import 'package:music_streaming/screens/welcome.dart';
 import 'package:provider/provider.dart';
 
 class Splash extends StatefulWidget {
@@ -45,8 +45,6 @@ class _SplashState extends State<Splash> {
 
   @override
   void initState() {
-    p.getSongs();
-    p.getAlbums();
     Future.delayed(
       Duration(milliseconds: 500),
       () {
@@ -54,12 +52,13 @@ class _SplashState extends State<Splash> {
         Future.delayed(
           Duration(seconds: 3),
           () {
+            setState(() {});
             // checkFirstSeen();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return HomeScreen();
+                  return Welcome();
                 },
               ),
             );
@@ -72,6 +71,7 @@ class _SplashState extends State<Splash> {
 
   @override
   Widget build(BuildContext context) {
+    p.initQuery();
     return Scaffold(
       body: AnimatedOpacity(
         duration: Duration(milliseconds: 1000),

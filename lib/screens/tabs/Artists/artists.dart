@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:music_streaming/providers/songs_provider.dart';
+import 'package:provider/provider.dart';
 
 class Artists extends StatefulWidget {
   const Artists({Key key}) : super(key: key);
@@ -8,8 +10,13 @@ class Artists extends StatefulWidget {
 }
 
 class _ArtistsState extends State<Artists> {
+  SongProvider get provider {
+    return Provider.of<SongProvider>(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    context.watch<SongProvider>().artists;
     return Padding(
       padding: const EdgeInsets.only(left: 30, top: 20, right: 30, bottom: 150),
       child: Container(
@@ -17,7 +24,7 @@ class _ArtistsState extends State<Artists> {
         child: GridView.builder(
           physics: BouncingScrollPhysics(),
           shrinkWrap: true,
-          itemCount: 200,
+          itemCount: provider.artists.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             mainAxisExtent: 200,
             crossAxisCount: 3,
@@ -41,7 +48,7 @@ class _ArtistsState extends State<Artists> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Artists',
+                    provider.artists[index].name,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.black,
@@ -51,7 +58,7 @@ class _ArtistsState extends State<Artists> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'Number of songs',
+                    'Number of songs ${provider.artists[index].numberOfTracks}',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,

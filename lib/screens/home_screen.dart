@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:music_streaming/constants/common.dart';
 
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/now_playing.dart';
@@ -42,6 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
   SongProvider get provider {
     return Provider.of<SongProvider>(context);
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   provider.getPlayLists();
+  //   super.didChangeDependencies();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -91,12 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   highlightColor: Colors.transparent,
                   focusColor: Colors.transparent,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Search(),
-                      ),
-                    );
+                    // context.read<SongProvider>().getArtists();
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => Search(),
+                    //   ),
+                    // );
                   },
                   icon: Image.asset('images/search.png', width: 20),
                 ),
@@ -116,7 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         currentIndex: currentIndex,
                         index: index,
                         ontapped: () {
-                          setState(() => currentIndex = index);
+                          setState(
+                            () => currentIndex = index,
+                          );
                         },
                       ),
                     )
@@ -189,8 +201,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          image: provider.playing?.albumArtwork == null
+                              ? AssetImage('images/music_note.png')
+                              : FileImage(
+                                  File(provider.playing.albumArtwork),
+                                ),
+                          fit: provider.playing?.albumArtwork == null
+                              ? BoxFit.contain
+                              : BoxFit.fitWidth,
+                        ),
                       ),
-                      child: Icon(Icons.music_note),
                     ),
                     Expanded(
                       child: Padding(

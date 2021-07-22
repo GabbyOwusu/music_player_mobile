@@ -1,16 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
+import 'package:music_streaming/providers/songs_provider.dart';
 
 class SongTile extends StatefulWidget {
+  final SongProvider provider;
   final SongInfo songInfo;
   final Function() onTap;
   final int index;
+  final ImageProvider<Object> coverArt;
 
   const SongTile({
     Key key,
     @required this.index,
+    @required this.coverArt,
     @required this.onTap,
     @required this.songInfo,
+    @required this.provider,
   }) : super(key: key);
 
   @override
@@ -18,6 +25,23 @@ class SongTile extends StatefulWidget {
 }
 
 class _SongTileState extends State<SongTile> {
+  List<int> image;
+
+  @override
+  void initState() {
+    widget.songInfo.albumArtwork ?? artWork();
+    super.initState();
+  }
+
+  Future artWork() async {
+    image = await widget.provider.getArtWork(
+      ResourceType.SONG,
+      widget.songInfo.id,
+    );
+    print('Image hereee $image');
+    return image;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -32,8 +56,11 @@ class _SongTileState extends State<SongTile> {
             decoration: BoxDecoration(
               color: Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: widget.coverArt,
+              ),
             ),
-            child: Icon(Icons.music_note),
+            // child: ,
           ),
           title: Text(widget.songInfo.title, overflow: TextOverflow.ellipsis),
           subtitle: Text(
@@ -51,6 +78,42 @@ class _SongTileState extends State<SongTile> {
   }
 }
 
+class CustomForm extends StatelessWidget {
+  final String hint;
+  final Function onchange;
+  const CustomForm({
+    Key key,
+    @required this.hint,
+    @required this.onchange,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onChanged: onchange,
+      decoration: InputDecoration(
+        hoverColor: Colors.transparent,
+        contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        isDense: true,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          borderSide: BorderSide(
+            color: Colors.grey[200],
+            width: 2,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          borderSide: BorderSide(color: Colors.black),
+        ),
+        hintText: hint,
+        hintStyle: TextStyle(fontSize: 15),
+        fillColor: Colors.grey[100],
+        filled: true,
+      ),
+    );
+  }
+}
 // class Art extends StatelessWidget {
 //   const Art({
 //     Key? key,
