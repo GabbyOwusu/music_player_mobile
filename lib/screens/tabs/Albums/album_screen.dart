@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
 import 'package:music_streaming/constants/common.dart';
@@ -7,7 +5,7 @@ import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:provider/provider.dart';
 
 class AlbumScreen extends StatefulWidget {
-  final Widget coverArt;
+  final ImageProvider<Object> coverArt;
   final AlbumInfo info;
   final SongProvider provider;
 
@@ -63,26 +61,16 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 floating: true,
                 backgroundColor: Colors.transparent,
                 expandedHeight: 280,
-                stretch: true,
                 flexibleSpace: FlexibleSpaceBar(
-                  stretchModes: [
-                    StretchMode.zoomBackground,
-                    StretchMode.blurBackground,
-                  ],
                   background: Container(
-                    // height: 350,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey,
                       image: DecorationImage(
-                        image: widget.info?.albumArt == null
-                            ? AssetImage('images/music_note.png')
-                            : FileImage(File(widget.info.albumArt)),
+                        image: widget.coverArt,
                         fit: BoxFit.fitWidth,
                       ),
                     ),
-
-                    // child: widget.coverArt,
                   ),
                 ),
               ),
@@ -91,8 +79,10 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 child: Column(
                   children: [
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 30,
+                        horizontal: 30,
+                      ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -119,7 +109,22 @@ class _AlbumScreenState extends State<AlbumScreen> {
                               SizedBox(height: 10),
                             ],
                           ),
-                          // Spacer(),
+                          Spacer(),
+                          Container(
+                            height: 40,
+                            width: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.blue,
+                            ),
+                            child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.play_arrow_rounded,
+                                  color: Colors.white,
+                                )),
+                          )
                         ],
                       ),
                     ),
