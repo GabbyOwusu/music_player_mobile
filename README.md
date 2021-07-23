@@ -1,6 +1,22 @@
 # music_streaming
 
-A new Flutter project.
+A music player built with flutter
+
+
+## Features
+
+- Loading songs, albums and playlists [In_progress]
+- Play song
+- Pause song
+- Resume song
+- Create a mix of songs [In_progress]
+
+
+## Preview
+
+![Screenshot](https://github.com/GabbyOwusu/music_player_mobile/blob/develop/images/ui_mockup/Music%20app.png)
+
+![Screenshot](https://github.com/GabbyOwusu/music_player_mobile/blob/develop/images/ui_mockup/Music%20app-1.png)
 
 ## Getting Started
 
