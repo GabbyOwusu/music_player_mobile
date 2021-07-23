@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 
 class SongTile extends StatefulWidget {
@@ -25,23 +24,6 @@ class SongTile extends StatefulWidget {
 }
 
 class _SongTileState extends State<SongTile> {
-  List<int> image;
-
-  @override
-  void initState() {
-    widget.songInfo.albumArtwork ?? artWork();
-    super.initState();
-  }
-
-  Future artWork() async {
-    image = await widget.provider.getArtWork(
-      ResourceType.SONG,
-      widget.songInfo.id,
-    );
-    print('Image hereee $image');
-    return image;
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -54,15 +36,18 @@ class _SongTileState extends State<SongTile> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: UiColors.grey,
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: widget.coverArt,
+                image: widget.coverArt ?? AssetImage('images/song_note.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            // child: ,
           ),
-          title: Text(widget.songInfo.title, overflow: TextOverflow.ellipsis),
+          title: Text(
+            widget.songInfo.title,
+            overflow: TextOverflow.ellipsis,
+          ),
           subtitle: Text(
             widget.songInfo.artist,
             overflow: TextOverflow.ellipsis,
@@ -114,34 +99,6 @@ class CustomForm extends StatelessWidget {
     );
   }
 }
-// class Art extends StatelessWidget {
-//   const Art({
-//     Key? key,
-//     required this.index,
-//     required this.type,
-//     required this.art,
-//     this.radius,
-//     this.fit,
-//   });
-
-//   final int? index;
-//   final ArtworkType type;
-//   final String? art;
-//   final BoxFit? fit;
-//   final BorderRadius? radius;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return QueryArtworkWidget(
-//       artworkFit: fit,
-//       artworkBorder: radius ?? BorderRadius.circular(12),
-//       id: index ?? 0,
-//       type: type,
-//       artwork: art,
-//       deviceSDK: 9,
-//     );
-//   }
-// }
 
 String parseToMinutesSeconds(int ms) {
   String data;
@@ -154,10 +111,18 @@ String parseToMinutesSeconds(int ms) {
   return data;
 }
 
+double convertToDouble(String value) {
+  var myDouble = double.parse(value);
+  assert(myDouble is double);
+  print(myDouble);
+  print(myDouble.runtimeType);
+  return myDouble;
+}
+
 Widget playArrow = Image.asset(
   'images/play.png',
   width: 25,
-  color: Colors.black,
+  color: Colors.white,
 );
 
 Widget backbutton(BuildContext context) {
@@ -196,7 +161,7 @@ AppBar appBAr(
 }
 
 class CustomField extends StatelessWidget {
-  final Function(void) onchange;
+  final Function(String) onchange;
 
   const CustomField({
     Key key,
@@ -205,37 +170,23 @@ class CustomField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      onChanged: onchange,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        disabledBorder: InputBorder.none,
-        suffixIcon: Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            color: Colors.black,
+    return Padding(
+      padding: const EdgeInsets.only(left: 30, right: 10),
+      child: TextField(
+        onChanged: onchange,
+        cursorColor: Colors.black,
+        decoration: InputDecoration(
+          disabledBorder: InputBorder.none,
+          filled: true,
+          isDense: true,
+          fillColor: Colors.grey[200],
+          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 30),
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Center(
-            child: Icon(
-              Icons.search,
-              color: Colors.white,
-              size: 25,
-            ),
-          ),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: EdgeInsets.only(left: 20),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        hintText: 'Search',
-        hintStyle: TextStyle(
-          fontSize: 17,
-          color: Colors.grey,
+          hintText: 'Search',
+          hintStyle: TextStyle(fontSize: 17, color: Colors.grey),
         ),
       ),
     );
