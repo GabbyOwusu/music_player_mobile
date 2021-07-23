@@ -10,7 +10,8 @@ import 'package:music_streaming/screens/lyrics_screen.dart';
 import 'package:provider/provider.dart';
 
 class NowPlaying extends StatefulWidget {
-  const NowPlaying({Key key}) : super(key: key);
+  const NowPlaying({Key key, @required this.artowrk}) : super(key: key);
+  final ImageProvider<Object> artowrk;
 
   @override
   _NowPlayingState createState() => _NowPlayingState();
@@ -19,7 +20,7 @@ class NowPlaying extends StatefulWidget {
 class _NowPlayingState extends State<NowPlaying> {
   double value = 30;
   SongProvider get provider {
-    return Provider.of<SongProvider>(context);
+    return Provider.of<SongProvider>(context, listen: false);
   }
 
   @override
@@ -46,17 +47,13 @@ class _NowPlayingState extends State<NowPlaying> {
                 padding: EdgeInsets.only(left: 20, bottom: 20),
                 margin: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
-                    image: provider.playing?.albumArtwork == null
-                        ? AssetImage('images/music_note.png')
-                        : FileImage(
-                            File(provider.playing.albumArtwork),
-                          ),
-                    fit: provider.playing?.albumArtwork == null
-                        ? BoxFit.contain
-                        : BoxFit.fitWidth,
+                    image: widget.artowrk ??
+                        AssetImage(
+                          'images/music_note.png',
+                        ),
+                    fit: BoxFit.cover,
                   ),
                 ),
                 child: GestureDetector(
@@ -95,18 +92,44 @@ class _NowPlayingState extends State<NowPlaying> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Image.asset('images/skip_previous.png', width: 20),
-                  Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.play_arrow_rounded,
-                      size: 50,
-                    ),
-                  ),
+                  provider.isPlaying == true
+                      ? Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                provider.pauseSong();
+                              });
+                            },
+                            icon: Icon(
+                              Icons.pause_rounded,
+                              size: 50,
+                            ),
+                          ))
+                      : Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                provider.resume();
+                              });
+                            },
+                            icon: Icon(
+                              Icons.play_arrow_rounded,
+                              size: 50,
+                            ),
+                          ),
+                        ),
                   Image.asset('images/skip_next.png', width: 20),
                 ],
               ),
