@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+
 import 'package:music_streaming/constants/common.dart';
+import 'package:music_streaming/providers/songs_provider.dart';
 
 class Playlist extends StatefulWidget {
-  const Playlist({Key key}) : super(key: key);
+  final SongProvider provider;
+  const Playlist({
+    Key key,
+    @required this.provider,
+  }) : super(key: key);
 
   @override
   _PlaylistState createState() => _PlaylistState();
@@ -137,7 +143,7 @@ class _PlaylistState extends State<Playlist> {
               ),
             ),
             Container(
-              height: 2000,
+              height: 1000,
               padding: const EdgeInsets.only(
                 left: 20,
                 top: 30,
@@ -147,7 +153,7 @@ class _PlaylistState extends State<Playlist> {
               child: GridView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: 3,
+                itemCount: 6, //widget.provider.playlist.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisExtent: 270,
                   crossAxisCount: 2,
@@ -156,39 +162,7 @@ class _PlaylistState extends State<Playlist> {
                 ),
                 itemBuilder: (context, index) {
                   return index == 0
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 200,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(Icons.add),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Create playlist',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Create a new playlist',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        )
+                      ? createPlayList(ontap: () {})
                       : GestureDetector(
                           onTap: () {},
                           child: Column(
@@ -205,7 +179,7 @@ class _PlaylistState extends State<Playlist> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                'Playlist title',
+                                'Worship',
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: Colors.black,
@@ -230,6 +204,58 @@ class _PlaylistState extends State<Playlist> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget createPlayList({VoidCallback ontap}) {
+    return GestureDetector(
+      onTap: ontap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black,
+                  ),
+                  child: Icon(Icons.add, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Create playlist',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(
+            'Create a new playlist',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
