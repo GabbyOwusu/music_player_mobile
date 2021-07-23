@@ -14,6 +14,8 @@ A music player built with flutter
 
 ## Preview
 
+Based on a ui design mockup, designed by me
+
 ![Screenshot](https://github.com/GabbyOwusu/music_player_mobile/blob/develop/images/ui_mockup/Music%20app.png)
 
 ![Screenshot](https://github.com/GabbyOwusu/music_player_mobile/blob/develop/images/ui_mockup/Music%20app-1.png)
