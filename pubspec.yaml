@@ -31,6 +31,8 @@ dependencies:
   provider:
   modal_bottom_sheet: 
   flutter_audio_query: 
+  audioplayers: 
+  device_info:   
 
 dev_dependencies:
   flutter_test:
