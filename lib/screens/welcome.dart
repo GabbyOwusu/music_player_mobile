@@ -1,20 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/providers/songs_provider.dart';
-import 'package:music_streaming/screens/home_screen.dart';
-import 'package:provider/provider.dart';
+import 'package:music_streaming/screens/index.dart';
 
-class Welcome extends StatefulWidget {
-  const Welcome({Key key}) : super(key: key);
-
-  @override
-  _WelcomeState createState() => _WelcomeState();
-}
-
-class _WelcomeState extends State<Welcome> {
-  SongProvider get p {
-    return Provider.of<SongProvider>(context, listen: false);
-  }
+class Welcome extends StatelessWidget {
+  const Welcome({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +27,7 @@ class _WelcomeState extends State<Welcome> {
               child: CustomForm(
                 hint: 'Enter username',
                 onchange: (state) {
-                  p.initQuery();
+                  // p.initQuery();
                 },
               ),
             ),
@@ -51,7 +40,7 @@ class _WelcomeState extends State<Welcome> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return HomeScreen();
+                return Index();
               },
             ),
           );
