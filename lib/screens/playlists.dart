@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/providers/songs_provider.dart';
 
 class Playlist extends StatefulWidget {
-  final SongProvider provider;
   const Playlist({
-    Key key,
-    @required this.provider,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -18,11 +14,19 @@ class _PlaylistState extends State<Playlist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBAr(
-        context,
-        'Playlists',
-        Icon(Icons.sort, color: Colors.black),
-        backbutton(context),
+      appBar: AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.keyboard_arrow_down, color: Colors.black),
+        ),
+        title: Text(
+          'Playlists',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -31,7 +35,7 @@ class _PlaylistState extends State<Playlist> {
           children: [
             SizedBox(height: 30),
             Padding(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'Just for you',
                 style: TextStyle(
@@ -42,7 +46,7 @@ class _PlaylistState extends State<Playlist> {
             ),
             SizedBox(height: 5),
             Padding(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'Created a list of mixes just for you',
                 style: TextStyle(
@@ -52,10 +56,12 @@ class _PlaylistState extends State<Playlist> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             Container(
-              height: 250,
-              child: ListView.builder(
+              height: 200,
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(width: 10),
+                padding: EdgeInsets.symmetric(horizontal: 30),
                 physics: BouncingScrollPhysics(),
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
@@ -63,24 +69,19 @@ class _PlaylistState extends State<Playlist> {
                 itemBuilder: (context, index) {
                   return Container(
                     height: 180,
-                    width: 350,
+                    width: 320,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    margin: EdgeInsets.only(
-                      left: index == 0 ? 20 : 0,
-                      right: 20,
-                      bottom: 60,
-                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          offset: Offset(0, 30),
-                          blurRadius: 30,
-                          spreadRadius: -15,
-                        ),
-                      ],
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.grey.withOpacity(0.2),
+                      //     offset: Offset(0, 30),
+                      //     blurRadius: 30,
+                      //     spreadRadius: -15,
+                      //   ),
+                      // ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +120,9 @@ class _PlaylistState extends State<Playlist> {
                 },
               ),
             ),
-            // SizedBox(height: 80),
+            SizedBox(height: 80),
             Padding(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'Playlist',
                 style: TextStyle(
@@ -132,7 +133,7 @@ class _PlaylistState extends State<Playlist> {
             ),
             SizedBox(height: 5),
             Padding(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'All your playlists in one place',
                 style: TextStyle(
@@ -142,18 +143,14 @@ class _PlaylistState extends State<Playlist> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
             Container(
-              height: 1000,
-              padding: const EdgeInsets.only(
-                left: 20,
-                top: 30,
-                right: 20,
-                bottom: 10,
-              ),
+              height: 500,
               child: GridView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 30),
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: 6, //widget.provider.playlist.length,
+                itemCount: 6,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisExtent: 270,
                   crossAxisCount: 2,
@@ -184,7 +181,6 @@ class _PlaylistState extends State<Playlist> {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 18,
                                 ),
                               ),
                               SizedBox(height: 5),
@@ -192,7 +188,6 @@ class _PlaylistState extends State<Playlist> {
                                 'Number of songs 10',
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 13,
                                   color: Colors.grey,
                                 ),
                               ),
@@ -202,13 +197,14 @@ class _PlaylistState extends State<Playlist> {
                 },
               ),
             ),
+            SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
 
-  Widget createPlayList({VoidCallback ontap}) {
+  Widget createPlayList({VoidCallback? ontap}) {
     return GestureDetector(
       onTap: ontap,
       child: Column(

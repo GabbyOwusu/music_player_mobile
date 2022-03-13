@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Music streaming',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),

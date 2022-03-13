@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:music_streaming/providers/songs_provider.dart';
+import 'package:provider/provider.dart';
 
 class Lyrics extends StatefulWidget {
-  const Lyrics({Key key}) : super(key: key);
+  const Lyrics({Key? key}) : super(key: key);
 
   @override
   _LyricsState createState() => _LyricsState();
@@ -11,6 +13,8 @@ class Lyrics extends StatefulWidget {
 class _LyricsState extends State<Lyrics> {
   @override
   Widget build(BuildContext context) {
+    final p = context.watch<SongProvider>();
+    final playing = p.playing;
     return Scaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.all(50),
@@ -19,7 +23,7 @@ class _LyricsState extends State<Lyrics> {
         child: Column(
           children: [
             Text(
-              'Forest Hills Drive',
+              playing?.album ?? 'Unknown',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 13,
@@ -27,7 +31,7 @@ class _LyricsState extends State<Lyrics> {
             ),
             SizedBox(height: 5),
             Text(
-              'Love Yours',
+              playing?.title ?? 'Unknown',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 20,

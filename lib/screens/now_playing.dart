@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,133 +6,157 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
+import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
+import 'package:music_streaming/widgets/artwork_widget.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 import 'package:provider/provider.dart';
 
 class NowPlaying extends StatefulWidget {
-  const NowPlaying({Key key, @required this.artowrk}) : super(key: key);
-  final ImageProvider<Object> artowrk;
+  const NowPlaying({Key? key, this.artowrk}) : super(key: key);
+  final ImageProvider<Object>? artowrk;
 
   @override
   _NowPlayingState createState() => _NowPlayingState();
 }
 
 class _NowPlayingState extends State<NowPlaying> {
-  double value = 30;
-  SongProvider get provider {
-    return Provider.of<SongProvider>(context, listen: false);
+  late Future<Uint8List?> f;
+
+  @override
+  void initState() {
+    final provider = context.read<SongProvider>();
+    final playing = provider.playing;
+    provider.getalbumSongs(type: AudiosFromType.ALBUM, id: playing!.album!);
+    f = OnAudioQuery().queryArtwork(
+      playing.id,
+      ArtworkType.AUDIO,
+      format: ArtworkFormat.PNG,
+      size: 500,
+      quality: 100,
+    );
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<SongProvider>();
+    final playing = provider.playing;
+
     return Scaffold(
-      appBar: appBAr(
-        context,
-        'Now Playing',
-        IconButton(
+      appBar: AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.keyboard_arrow_down, color: Colors.black),
         ),
-        SizedBox(),
+        title: Text(
+          'Now Playing',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 300,
-                width: double.infinity,
-                alignment: Alignment.bottomLeft,
-                padding: EdgeInsets.only(left: 20, bottom: 20),
-                margin: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(
-                    image: widget.artowrk ??
-                        AssetImage(
-                          'images/music_note.png',
-                        ),
-                    fit: BoxFit.cover,
-                  ),
+          Container(
+            height: 300,
+            width: double.infinity,
+            padding: EdgeInsets.only(left: 20, bottom: 20),
+            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+            child: Stack(
+              children: [
+                ArtworkWidget(
+                  future: f,
+                  artworkBorder: BorderRadius.circular(20),
+                  nullArtworkWidget: Icon(Icons.music_note),
+                  artworkWidth: double.infinity,
+                  artworkHeight: double.infinity,
+                  id: playing?.id ?? 0,
+                  type: ArtworkType.AUDIO,
                 ),
-                child: GestureDetector(
+                GestureDetector(
                   onTap: () {
                     showCupertinoModalBottomSheet(
                       context: context,
                       builder: (context) => Lyrics(),
                     );
                   },
-                  child: Text('Lyrics'),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20, bottom: 20),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'Lyrics',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            playing?.artist ?? '<Unknown>',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 13,
+            ),
+          ),
+          SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              playing?.title ?? "Unknown",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
               ),
-              SizedBox(height: 10),
-              Text(
-                provider.playing?.artist ?? '<Unknown>',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
+            ),
+          ),
+          SizedBox(height: 50),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Image.asset('images/skip_previous.png', width: 20),
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
                 ),
-              ),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  provider.playing?.title ?? '<Unknown>',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                child: IconButton(
+                  onPressed: () {
+                    provider.isPlaying == true
+                        ? provider.pauseSong()
+                        : provider.resume();
+                  },
+                  icon: Icon(
+                    provider.isPlaying == true
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                    size: 50,
                   ),
                 ),
               ),
-              SizedBox(height: 50),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Image.asset('images/skip_previous.png', width: 20),
-                  provider.isPlaying == true
-                      ? Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                provider.pauseSong();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.pause_rounded,
-                              size: 50,
-                            ),
-                          ))
-                      : Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                provider.resume();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.play_arrow_rounded,
-                              size: 50,
-                            ),
-                          ),
-                        ),
-                  Image.asset('images/skip_next.png', width: 20),
-                ],
-              ),
+              Image.asset('images/skip_next.png', width: 20),
             ],
           ),
           Spacer(),
@@ -146,15 +170,16 @@ class _NowPlayingState extends State<NowPlaying> {
                 ),
                 Spacer(),
                 IconButton(
+                  icon: Icon(Icons.menu),
                   onPressed: () {
                     showCupertinoModalBottomSheet(
                       context: context,
-                      builder: (context) => AlbumSongs(
-                        p: provider,
+                      builder: (context) => _AlbumSongs(
+                        p: provider.albumSongs,
+                        song: playing,
                       ),
                     );
                   },
-                  icon: Icon(Icons.menu),
                 ),
               ],
             ),
@@ -170,11 +195,12 @@ class _NowPlayingState extends State<NowPlaying> {
               child: Slider(
                 activeColor: Colors.black,
                 inactiveColor: Colors.grey[300],
-                value: value,
+                value: provider.currentDuration.toDouble(),
                 min: 0.0,
-                max: 100,
-                onChanged: (v) {
-                  setState(() => value = v);
+                max: provider.duration?.inSeconds.toDouble() ?? 100,
+                onChanged: (v) async {
+                  double position = v - provider.currentDuration;
+                  await provider.seek(position);
                 },
               ),
             ),
@@ -183,9 +209,13 @@ class _NowPlayingState extends State<NowPlaying> {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Row(
               children: [
-                Text('00:05'),
+                Text(provider.timePlayed ?? "00:00"),
                 Spacer(),
-                Text('04:05'),
+                Text(
+                  parseToMinutesSeconds(
+                    int.parse(playing?.duration?.toString() ?? "0"),
+                  ),
+                ),
               ],
             ),
           ),
@@ -196,81 +226,62 @@ class _NowPlayingState extends State<NowPlaying> {
   }
 }
 
-class AlbumSongs extends StatelessWidget {
-  const AlbumSongs({Key key, @required this.p}) : super(key: key);
+class _AlbumSongs extends StatelessWidget {
+  const _AlbumSongs({Key? key, this.p, this.song}) : super(key: key);
 
-  final SongProvider p;
+  final SongModel? song;
+  final List<SongModel>? p;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(
-          top: 30,
-          left: 20,
-          right: 20,
-        ),
-        child: SingleChildScrollView(
-          controller: ModalScrollController.of(context),
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Row(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Forest Hills Drive - 13 songs',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'Love Yours',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    Container(
-                      alignment: Alignment.center,
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[300],
+                    Text(
+                      '${song?.album} - ${p?.length} songs',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
                       ),
-                      child: Icon(
-                        CupertinoIcons.heart_fill,
-                        size: 20,
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      song?.title ?? "Unknown",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
                       ),
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: 30),
-              ...List.generate(20, (index) {
-                return SongTile(
-                  coverArt: FileImage(
-                    File(p.songs[index].albumArtwork),
+                Spacer(),
+                Container(
+                  alignment: Alignment.center,
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.grey[300]),
+                  child: Icon(
+                    CupertinoIcons.heart_fill,
+                    size: 20,
                   ),
-                  provider: p,
-                  index: index,
-                  songInfo: p.songs[index],
-                  onTap: () {},
-                );
-              })
-            ],
-          ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            ...List.generate(p?.length ?? 0, (index) {
+              return SongTile(song: (p ?? [])[index]);
+            })
+          ],
         ),
       ),
     );
