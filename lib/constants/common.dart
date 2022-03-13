@@ -1,75 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_audio_query/flutter_audio_query.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
-import 'package:music_streaming/providers/songs_provider.dart';
-
-class SongTile extends StatefulWidget {
-  final SongProvider provider;
-  final SongInfo songInfo;
-  final Function() onTap;
-  final int index;
-  final ImageProvider<Object> coverArt;
-
-  const SongTile({
-    Key key,
-    @required this.index,
-    @required this.coverArt,
-    @required this.onTap,
-    @required this.songInfo,
-    @required this.provider,
-  }) : super(key: key);
-
-  @override
-  _SongTileState createState() => _SongTileState();
-}
-
-class _SongTileState extends State<SongTile> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        alignment: Alignment.center,
-        margin: EdgeInsets.only(bottom: 10),
-        child: ListTile(
-          leading: Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              color: UiColors.grey,
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: widget.coverArt ?? AssetImage('images/song_note.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          title: Text(
-            widget.songInfo.title,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(
-            widget.songInfo.artist,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: Text(
-            '${parseToMinutesSeconds(
-              int.parse(widget.songInfo.duration.toString()),
-            )}',
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class CustomForm extends StatelessWidget {
-  final String hint;
-  final Function onchange;
+  final String? hint;
+  final Function(String)? onchange;
   const CustomForm({
-    Key key,
-    @required this.hint,
-    @required this.onchange,
+    Key? key,
+    this.hint,
+    this.onchange,
   }) : super(key: key);
 
   @override
@@ -83,7 +20,7 @@ class CustomForm extends StatelessWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(
-            color: Colors.grey[200],
+            color: Colors.grey,
             width: 2,
           ),
         ),
@@ -113,7 +50,6 @@ String parseToMinutesSeconds(int ms) {
 
 double convertToDouble(String value) {
   var myDouble = double.parse(value);
-  assert(myDouble is double);
   print(myDouble);
   print(myDouble.runtimeType);
   return myDouble;
@@ -137,35 +73,12 @@ Widget backbutton(BuildContext context) {
   );
 }
 
-AppBar appBAr(
-  BuildContext context,
-  String title,
-  Widget trailing,
-  Widget leadingIcon,
-) {
-  return AppBar(
-    centerTitle: true,
-    automaticallyImplyLeading: false,
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    leading: leadingIcon,
-    title: Text(
-      title,
-      style: TextStyle(color: Colors.black),
-    ),
-    actions: [
-      trailing,
-      SizedBox(width: 20),
-    ],
-  );
-}
-
 class CustomField extends StatelessWidget {
-  final Function(String) onchange;
+  final Function(String)? onchange;
 
   const CustomField({
-    Key key,
-    @required this.onchange,
+    Key? key,
+    this.onchange,
   }) : super(key: key);
 
   @override
@@ -190,5 +103,131 @@ class CustomField extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SquircleBorder extends ShapeBorder {
+  final BorderSide side;
+  final BorderRadius? radius;
+
+  const SquircleBorder({
+    this.side: BorderSide.none,
+    this.radius,
+  });
+
+  const SquircleBorder.only({
+    this.side: BorderSide.none,
+    this.radius,
+  });
+
+  @override
+  EdgeInsetsGeometry get dimensions => EdgeInsets.all(side.width);
+
+  SquircleBorder none() => const SquircleBorder(radius: BorderRadius.zero);
+
+  @override
+  ShapeBorder scale(double t) {
+    return SquircleBorder(
+      side: side.scale(t),
+      radius: radius,
+    );
+  }
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
+    return _squirclePath(rect.deflate(side.width), radius);
+  }
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    return _squirclePath(rect, radius);
+  }
+
+  static Path _squirclePath(Rect rect, BorderRadius? radius) {
+    final c = rect.center;
+    double startX = rect.left;
+    double endX = rect.right;
+    double startY = rect.top;
+    double endY = rect.bottom;
+
+    double midX = c.dx;
+    double midY = c.dy;
+
+    if (radius == null) {
+      return Path()
+        ..moveTo(startX, midY)
+        ..cubicTo(startX, startY, startX, startY, midX, startY)
+        ..cubicTo(endX, startY, endX, startY, endX, midY)
+        ..cubicTo(endX, endY, endX, endY, midX, endY)
+        ..cubicTo(startX, endY, startX, endY, startX, midY)
+        ..close();
+    }
+
+    return Path()
+
+      // Start position
+      ..moveTo(startX, startY + radius.topLeft.y)
+
+      // top left corner
+      ..cubicTo(
+        startX,
+        startY,
+        startX,
+        startY,
+        startX + radius.topLeft.x,
+        startY,
+      )
+
+      // top line
+      ..lineTo(endX - radius.topRight.x, startY)
+
+      // top right corner
+      ..cubicTo(
+        endX,
+        startY,
+        endX,
+        startY,
+        endX,
+        startY + radius.topRight.y,
+      )
+
+      // right line
+      ..lineTo(endX, endY - radius.bottomRight.y)
+
+      // bottom right corner
+      ..cubicTo(
+        endX,
+        endY,
+        endX,
+        endY,
+        endX - radius.bottomRight.x,
+        endY,
+      )
+
+      // bottom line
+      ..lineTo(startX + radius.bottomLeft.x, endY)
+
+      // bottom left corner
+      ..cubicTo(
+        startX,
+        endY,
+        startX,
+        endY,
+        startX,
+        endY - radius.bottomLeft.y,
+      )
+      ..close();
+  }
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
+    switch (side.style) {
+      case BorderStyle.none:
+        break;
+      case BorderStyle.solid:
+        var path = getOuterPath(rect.deflate(side.width / 2.0),
+            textDirection: textDirection);
+        canvas.drawPath(path, side.toPaint());
+    }
   }
 }
