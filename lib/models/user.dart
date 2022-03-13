@@ -1,4 +1,4 @@
 class User {
-  String username;
-  String image;
+  String? username;
+  String? image;
 }
