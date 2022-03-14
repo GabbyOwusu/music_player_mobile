@@ -46,13 +46,16 @@ class _AlbumCardState extends State<AlbumCard> {
             width: 200,
             height: 200,
             decoration: BoxDecoration(
-              color: UiColors.grey,
-              borderRadius: BorderRadius.circular(8),
+              color: UiColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: ArtworkWidget(
               future: f,
-              artworkBorder: BorderRadius.circular(8),
-              nullArtworkWidget: Icon(Icons.music_note),
+              artworkBorder: BorderRadius.circular(16),
+              nullArtworkWidget: Icon(
+                Icons.music_note,
+                color: UiColors.blue,
+              ),
               artworkWidth: double.infinity,
               artworkHeight: double.infinity,
               id: widget.album?.id ?? 0,
