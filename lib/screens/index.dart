@@ -13,6 +13,8 @@ import 'package:on_audio_query/on_audio_query.dart';
 
 import 'package:provider/provider.dart';
 
+import '../constants/ui_colors.dart';
+
 class Index extends StatelessWidget {
   Index({
     Key? key,
@@ -44,20 +46,26 @@ class Index extends StatelessWidget {
           backgroundColor: Colors.white,
           centerTitle: false,
           title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30),
-            child: Text(
-              'Hello Gabby!',
-              style: TextStyle(
-                color: Colors.black,
-              ),
+            padding: EdgeInsets.only(top: 15, left: 10),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundImage: AssetImage("images/dj.jpg"),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Hello Gabby!',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ],
             ),
           ),
           actions: [
             Container(
-              margin: EdgeInsets.only(right: 20),
+              margin: EdgeInsets.only(right: 30, top: 20),
               alignment: Alignment.center,
-              height: 50,
-              width: 50,
+              height: 40,
+              width: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.grey[100],
@@ -81,13 +89,25 @@ class Index extends StatelessWidget {
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(60),
             child: TabBar(
+              padding: EdgeInsets.only(bottom: 10),
               isScrollable: true,
               labelPadding: EdgeInsets.symmetric(horizontal: 30),
               indicatorSize: TabBarIndicatorSize.label,
               unselectedLabelColor: Colors.grey,
               labelColor: Colors.black,
               indicatorColor: Colors.black,
-              tabs: tabMenu.map((e) => Tab(child: Text(e))).toList(),
+              tabs: tabMenu.map(
+                (e) {
+                  return Tab(
+                    height: 22,
+                    iconMargin: EdgeInsets.zero,
+                    child: Text(
+                      e,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                },
+              ).toList(),
             ),
           ),
         ),
@@ -159,13 +179,17 @@ class _PlayingCardState extends State<PlayingCard> {
               height: 40,
               width: 40,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: UiColors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: QueryArtworkWidget(
                 keepOldArtwork: true,
                 artworkBorder: BorderRadius.circular(10),
-                nullArtworkWidget: Icon(Icons.music_note),
+                nullArtworkWidget: Icon(
+                  Icons.music_note,
+                  color: UiColors.blue,
+                  size: 15,
+                ),
                 artworkWidth: double.infinity,
                 artworkHeight: double.infinity,
                 id: playing?.id ?? 0,
@@ -200,10 +224,23 @@ class _PlayingCardState extends State<PlayingCard> {
               ),
             ),
             Spacer(),
-            Image.asset(
-              'images/play.png',
-              color: Colors.black,
-              width: 30,
+            GestureDetector(
+              onTap: () {
+                p.isPlaying == true ? p.pauseSong() : p.resume();
+              },
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  p.isPlaying == true
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  size: 20,
+                ),
+              ),
             ),
             SizedBox(width: 20),
           ],
