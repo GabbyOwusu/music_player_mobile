@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/common.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -58,19 +59,24 @@ class _SongTileState extends State<SongTile> {
           contentPadding: EdgeInsets.zero,
           leading: widget.leading ??
               Container(
-                decoration: BoxDecoration(),
+                decoration: BoxDecoration(
+                  color: UiColors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 height: 50,
                 width: 50,
-                child: Material(
-                  child: ArtworkWidget(
-                    future: f,
-                    artworkBorder: BorderRadius.circular(16),
-                    nullArtworkWidget: Icon(Icons.music_note),
-                    artworkWidth: double.infinity,
-                    artworkHeight: double.infinity,
-                    id: widget.song?.id ?? 0,
-                    type: ArtworkType.AUDIO,
+                child: ArtworkWidget(
+                  future: f,
+                  artworkBorder: BorderRadius.circular(16),
+                  nullArtworkWidget: Icon(
+                    Icons.music_note,
+                    color: UiColors.blue,
+                    size: 15,
                   ),
+                  artworkWidth: double.infinity,
+                  artworkHeight: double.infinity,
+                  id: widget.song?.id ?? 0,
+                  type: ArtworkType.AUDIO,
                 ),
               ),
           title: Text(
