@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -17,7 +18,7 @@ class _ArtistsState extends State<Artists> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final artists = provider.artists;
+    final artists = provider.artists ?? [];
     return Container(
       height: 500,
       child: GridView.builder(
@@ -82,13 +83,17 @@ class _ArtistCardState extends State<ArtistCard>
             width: 200,
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: UiColors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ArtworkWidget(
               future: f,
               artworkBorder: BorderRadius.circular(8),
-              nullArtworkWidget: Icon(Icons.music_note),
+              nullArtworkWidget: Icon(
+                Icons.music_note,
+                size: 18,
+                color: UiColors.blue,
+              ),
               artworkWidth: double.infinity,
               artworkHeight: double.infinity,
               id: widget.artists.id,

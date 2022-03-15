@@ -19,7 +19,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     super.build(context);
     final provider = context.watch<SongProvider>();
-    final albums = provider.albums;
+    final albums = provider.albums ?? [];
 
     return Container(
       height: 500,

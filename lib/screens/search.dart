@@ -14,8 +14,8 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  List<SongModel> songResults = [];
-  List<AlbumModel> albumResults = [];
+  List<SongModel>? songResults = [];
+  List<AlbumModel>? albumResults = [];
   String? query;
 
   @override
@@ -51,14 +51,11 @@ class _SearchState extends State<Search> {
                   onchange: (data) {
                     if (data.isNotEmpty)
                       setState(() {
-                        songResults = provider.songs.where((song) {
+                        songResults = provider.songs?.where((song) {
                           return song.title.toLowerCase().contains(data) ||
                               song.artist!.toLowerCase().contains(data);
                         }).toList();
-
-                        query = songResults.isEmpty || albumResults.isEmpty
-                            ? null
-                            : data;
+                        query = (songResults ?? []).isEmpty ? null : data;
                       });
                     else
                       setState(() {
@@ -90,7 +87,7 @@ class _SearchState extends State<Search> {
           ),
         ),
       ),
-      body: songResults.isEmpty
+      body: (songResults ?? []).isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -121,14 +118,14 @@ class _SearchState extends State<Search> {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 shrinkWrap: true,
-                itemCount: songResults.length,
+                itemCount: songResults?.length ?? 0,
                 itemBuilder: (context, index) {
-                  final song = songResults[index];
-                  final playing = provider.playing?.title == song.title &&
-                      provider.playing?.artist == song.artist;
+                  final song = songResults?[index];
+                  final playing = provider.playing?.title == song?.title &&
+                      provider.playing?.artist == song?.artist;
                   return GestureDetector(
                     onTap: () async {
-                      await provider.playSong(song);
+                      await provider.playSong(song!);
                     },
                     child: Container(
                       alignment: Alignment.center,
@@ -144,12 +141,12 @@ class _SearchState extends State<Search> {
                             nullArtworkWidget: Icon(Icons.music_note),
                             artworkWidth: double.infinity,
                             artworkHeight: double.infinity,
-                            id: song.id,
+                            id: song?.id ?? 0,
                             type: ArtworkType.AUDIO,
                           ),
                         ),
                         title: Text(
-                          song.title,
+                          song?.title ?? "",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
@@ -159,7 +156,7 @@ class _SearchState extends State<Search> {
                           ),
                         ),
                         subtitle: Text(
-                          song.artist ?? "Unknown",
+                          song?.artist ?? "Unknown",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
@@ -169,7 +166,7 @@ class _SearchState extends State<Search> {
                           ),
                         ),
                         trailing: Text(
-                          '${parseToMinutesSeconds(int.parse(song.duration.toString()))}',
+                          '${parseToMinutesSeconds(int.parse(song?.duration.toString() ?? "0"))}',
                           style: TextStyle(
                             fontSize: 14,
                             color: playing ? Colors.blue : Colors.grey,

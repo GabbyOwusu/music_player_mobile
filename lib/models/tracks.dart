@@ -1,23 +1,31 @@
 class SongData {
-  final String title;
-  final String artist;
-  final String timestamp;
-  final String coverArt;
+  final String? title;
+  final String? artist;
+  final int? duration;
+  final int? id;
 
-  SongData(
+  SongData({
     this.title,
     this.artist,
-    this.timestamp,
-    this.coverArt,
-  );
-}
+    this.duration,
+    this.id,
+  });
 
-class AlbumData {
-  String title;
-  List<SongData> songList;
+  Map<String, dynamic> toJson() {
+    return {
+      "title": title,
+      "artist": artist,
+      "duration": duration,
+      "id": id,
+    };
+  }
 
-  AlbumData(
-    this.title,
-    this.songList,
-  );
+  factory SongData.fromJson(Map<String, dynamic> json) {
+    return SongData(
+      title: json["title"] as String?,
+      artist: json["artist"] as String?,
+      duration: json["duration"] as int?,
+      id: json["_id"] as int?,
+    );
+  }
 }

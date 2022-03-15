@@ -37,8 +37,7 @@ class _PlayListDetailsState extends State<PlayListDetails> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    // provider.getPlaylistSongs(widget.playlist.id.toString());
-    final albumSongs = provider.playlistSongs;
+    final albumSongs = provider.playlistSongs ?? [];
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -102,7 +101,7 @@ class _PlayListDetailsState extends State<PlayListDetails> {
                                   fontSize: 18,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              SizedBox(height: 5),
                               Text(
                                 '${widget.playlist.numOfSongs} songs',
                                 style: TextStyle(

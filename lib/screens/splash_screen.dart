@@ -69,7 +69,7 @@ class _SplashState extends State<Splash> {
         opacity: visible ? 1 : 0,
         child: Center(
           child: Text(
-            'Hi there,',
+            'Hi there',
             style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,

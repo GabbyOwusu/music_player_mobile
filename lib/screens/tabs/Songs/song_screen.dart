@@ -18,12 +18,12 @@ class _SongsState extends State<Songs> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     super.build(context);
     final provider = context.watch<SongProvider>();
-    final songs = provider.songs;
+    final songs = provider.songs ?? [];
 
     return SizedBox(
       height: 500,
       child: ListView.separated(
-        separatorBuilder: (context, index) => SizedBox(height: 5),
+        separatorBuilder: (context, index) => SizedBox(height: 2),
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
         shrinkWrap: true,
         physics: BouncingScrollPhysics(),

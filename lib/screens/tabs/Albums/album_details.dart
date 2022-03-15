@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
@@ -37,7 +38,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final albumSongs = provider.albumSongs;
+    final albumSongs = provider.albumSongs ?? [];
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -60,7 +61,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   width: double.infinity,
-                  decoration: BoxDecoration(color: Colors.grey),
+                  decoration: BoxDecoration(
+                    color: UiColors.blue.withOpacity(0.1),
+                  ),
                   child: ArtworkWidget(
                     future: f,
                     format: ArtworkFormat.PNG,
@@ -68,7 +71,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     quality: 100,
                     artworkQuality: FilterQuality.high,
                     artworkBorder: BorderRadius.circular(0),
-                    nullArtworkWidget: Icon(Icons.music_note),
+                    nullArtworkWidget: Icon(
+                      Icons.music_note,
+                      size: 20,
+                      color: UiColors.blue,
+                    ),
                     artworkWidth: double.infinity,
                     artworkHeight: double.infinity,
                     id: widget.album.id,
@@ -101,7 +108,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                   fontSize: 18,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              SizedBox(height: 5),
                               Text(
                                 '${widget.album.artist} - ${widget.album.numOfSongs} songs',
                                 style: TextStyle(
@@ -145,10 +152,14 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                             width: 50,
                             margin: EdgeInsets.only(right: 5),
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: UiColors.blue.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(Icons.music_note),
+                            child: Icon(
+                              Icons.music_note,
+                              color: UiColors.blue,
+                              size: 15,
+                            ),
                           ),
                         ),
                       );

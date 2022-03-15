@@ -4,17 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-
 import 'package:provider/provider.dart';
 
 class NowPlaying extends StatefulWidget {
-  const NowPlaying({Key? key, this.artowrk}) : super(key: key);
-  final ImageProvider<Object>? artowrk;
+  const NowPlaying({Key? key}) : super(key: key);
 
   @override
   _NowPlayingState createState() => _NowPlayingState();
@@ -26,8 +25,9 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   void initState() {
     final provider = context.read<SongProvider>();
-    final playing = provider.playing;
-    provider.getalbumSongs(type: AudiosFromType.ALBUM, id: playing!.album!);
+    final playing =
+        provider.playing ?? provider.recent ?? (provider.songs ?? []).first;
+    provider.getalbumSongs(type: AudiosFromType.ALBUM, id: playing.album!);
     f = OnAudioQuery().queryArtwork(
       playing.id,
       ArtworkType.AUDIO,
@@ -41,8 +41,7 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final playing = provider.playing;
-
+    final playing = provider.playing ?? provider.recent;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -64,19 +63,26 @@ class _NowPlayingState extends State<NowPlaying> {
           Container(
             height: 300,
             width: double.infinity,
-            padding: EdgeInsets.only(left: 20, bottom: 20),
             margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(
+              color: UiColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Stack(
               children: [
-                ArtworkWidget(
-                  future: f,
-                  artworkBorder: BorderRadius.circular(20),
-                  nullArtworkWidget: Icon(Icons.music_note),
-                  artworkWidth: double.infinity,
-                  artworkHeight: double.infinity,
-                  id: playing?.id ?? 0,
-                  type: ArtworkType.AUDIO,
+                Center(
+                  child: ArtworkWidget(
+                    future: f,
+                    artworkBorder: BorderRadius.circular(20),
+                    nullArtworkWidget: Icon(
+                      Icons.music_note,
+                      color: UiColors.blue,
+                    ),
+                    artworkWidth: double.infinity,
+                    artworkHeight: double.infinity,
+                    id: playing?.id ?? 0,
+                    type: ArtworkType.AUDIO,
+                  ),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -88,7 +94,7 @@ class _NowPlayingState extends State<NowPlaying> {
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20, bottom: 20),
+                      padding: EdgeInsets.only(left: 10, bottom: 10),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           vertical: 5,
@@ -118,7 +124,7 @@ class _NowPlayingState extends State<NowPlaying> {
               fontSize: 13,
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 5),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
@@ -130,33 +136,45 @@ class _NowPlayingState extends State<NowPlaying> {
               ),
             ),
           ),
-          SizedBox(height: 50),
+          SizedBox(height: 40),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Image.asset('images/skip_previous.png', width: 20),
+              IconButton(
+                onPressed: () {},
+                iconSize: 30,
+                icon: Icon(Icons.skip_previous_rounded),
+              ),
               Container(
-                height: 100,
-                width: 100,
+                height: 80,
+                width: 80,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Colors.grey.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   onPressed: () {
-                    provider.isPlaying == true
-                        ? provider.pauseSong()
-                        : provider.resume();
+                    if (provider.playing == null) {
+                      provider.playSong(playing!);
+                      return;
+                    } else
+                      provider.isPlaying == true
+                          ? provider.pauseSong()
+                          : provider.resume();
                   },
                   icon: Icon(
                     provider.isPlaying == true
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
-                    size: 50,
+                    size: 35,
                   ),
                 ),
               ),
-              Image.asset('images/skip_next.png', width: 20),
+              IconButton(
+                onPressed: () {},
+                iconSize: 30,
+                icon: Icon(Icons.skip_next_rounded),
+              ),
             ],
           ),
           Spacer(),
@@ -243,33 +261,36 @@ class _AlbumSongs extends StatelessWidget {
           children: [
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${song?.album} - ${p?.length} songs',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 13,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${song?.album} - ${p?.length} songs',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      song?.title ?? "Unknown",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                      SizedBox(height: 5),
+                      Text(
+                        song?.title ?? "Unknown",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Spacer(),
                 Container(
                   alignment: Alignment.center,
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.grey[300]),
+                    shape: BoxShape.circle,
+                    color: Colors.grey[300],
+                  ),
                   child: Icon(
                     CupertinoIcons.heart_fill,
                     size: 20,
