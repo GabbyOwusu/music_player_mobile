@@ -5,10 +5,11 @@ A music player built with flutter
 
 ## Features
 
-- Loading songs, albums and playlists [In_progress]
+- Fetch all songs on device [Albums, Songs, Playlists] with albumArt
 - Play song
 - Pause song
 - Resume song
+- Search songs
 - Create a mix of songs [In_progress]
 
 
