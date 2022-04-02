@@ -1,14 +1,13 @@
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
-import 'package:music_streaming/widgets/artwork_widget.dart';
+import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
@@ -20,28 +19,31 @@ class NowPlaying extends StatefulWidget {
 }
 
 class _NowPlayingState extends State<NowPlaying> {
-  late Future<Uint8List?> f;
+  final iconMap = {
+    Loop.all: Icons.repeat_outlined,
+    Loop.repeat: Icons.repeat_one_outlined
+  };
 
-  @override
-  void initState() {
-    final provider = context.read<SongProvider>();
-    final playing =
-        provider.playing ?? provider.recent ?? (provider.songs ?? []).first;
-    provider.getalbumSongs(type: AudiosFromType.ALBUM, id: playing.album!);
-    f = OnAudioQuery().queryArtwork(
-      playing.id,
-      ArtworkType.AUDIO,
-      format: ArtworkFormat.PNG,
-      size: 500,
-      quality: 100,
-    );
-    super.initState();
+  void setLoop() {
+    final p = context.read<SongProvider>();
+    switch (p.loop) {
+      case Loop.repeat:
+        p.setLoopMode(Loop.all);
+        break;
+      case Loop.all:
+        p.setLoopMode(Loop.repeat);
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
     final playing = provider.playing ?? provider.recent;
+    final albumSongs = provider.songs.where((s) {
+      return s.album == playing?.album;
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -56,6 +58,22 @@ class _NowPlayingState extends State<NowPlaying> {
           'Now Playing',
           style: TextStyle(color: Colors.black),
         ),
+        actions: [
+          IconButton(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            icon: Icon(Iconsax.menu_1),
+            color: Colors.black,
+            onPressed: () {
+              showCupertinoModalBottomSheet(
+                context: context,
+                builder: (context) => _AlbumSongs(
+                  p: albumSongs,
+                  song: playing,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -70,20 +88,7 @@ class _NowPlayingState extends State<NowPlaying> {
             ),
             child: Stack(
               children: [
-                Center(
-                  child: ArtworkWidget(
-                    future: f,
-                    artworkBorder: BorderRadius.circular(20),
-                    nullArtworkWidget: Icon(
-                      Icons.music_note,
-                      color: UiColors.blue,
-                    ),
-                    artworkWidth: double.infinity,
-                    artworkHeight: double.infinity,
-                    id: playing?.id ?? 0,
-                    type: ArtworkType.AUDIO,
-                  ),
-                ),
+                Center(child: CoverArt(art: provider.nowPlayingArt)),
                 GestureDetector(
                   onTap: () {
                     showCupertinoModalBottomSheet(
@@ -129,7 +134,7 @@ class _NowPlayingState extends State<NowPlaying> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               playing?.title ?? "Unknown",
-              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
@@ -141,7 +146,9 @@ class _NowPlayingState extends State<NowPlaying> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  provider.skip(prev: true);
+                },
                 iconSize: 30,
                 icon: Icon(Icons.skip_previous_rounded),
               ),
@@ -149,7 +156,7 @@ class _NowPlayingState extends State<NowPlaying> {
                 height: 80,
                 width: 80,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: UiColors.blue.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -167,11 +174,14 @@ class _NowPlayingState extends State<NowPlaying> {
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
                     size: 35,
+                    color: UiColors.blue,
                   ),
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  provider.skip(next: true);
+                },
                 iconSize: 30,
                 icon: Icon(Icons.skip_next_rounded),
               ),
@@ -183,60 +193,77 @@ class _NowPlayingState extends State<NowPlaying> {
             child: Row(
               children: [
                 IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.shuffle_rounded),
+                  onPressed: () {
+                    if (provider.shuffle == true) {
+                      provider.setShuffle(false);
+                    } else {
+                      provider.setShuffle(true);
+                    }
+                  },
+                  icon: Icon(Iconsax.shuffle),
+                  color: provider.shuffle == true ? Colors.blue : Colors.black,
+                  iconSize: 24,
                 ),
                 Spacer(),
                 IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    showCupertinoModalBottomSheet(
-                      context: context,
-                      builder: (context) => _AlbumSongs(
-                        p: provider.albumSongs,
-                        song: playing,
+                  iconSize: 24,
+                  color: Colors.blue,
+                  icon: Icon(iconMap[provider.loop]),
+                  onPressed: () => setLoop(),
+                ),
+              ],
+            ),
+          ),
+          StreamBuilder<Duration>(
+              stream: provider.audioPlayer?.positionStream,
+              builder: (context, snapshot) {
+                final data = snapshot.data;
+                bool? hasHours = (data?.inHours ?? 0) > 0;
+                bool? hasHrDuration = (provider.duration?.inHours ?? 0) > 0;
+                final hours = twoDigits(data?.inHours.remainder(60));
+                final mins = twoDigits(data?.inMinutes.remainder(60));
+                final secs = twoDigits(data?.inSeconds.remainder(60));
+                return Expanded(
+                  child: Column(
+                    children: [
+                      SliderTheme(
+                        data: SliderThemeData(
+                          trackHeight: 1,
+                          thumbShape: RoundSliderThumbShape(
+                            enabledThumbRadius: 8,
+                          ),
+                        ),
+                        child: Expanded(
+                          child: Slider(
+                            activeColor: UiColors.blue,
+                            inactiveColor: UiColors.blue.withOpacity(0.1),
+                            value: (data?.inSeconds ?? 0).toDouble(),
+                            min: 0.0,
+                            max: provider.duration?.inSeconds.toDouble() ?? 1,
+                            onChanged: (v) async {
+                              await provider.seek(v);
+                            },
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 1,
-              thumbShape: RoundSliderThumbShape(
-                enabledThumbRadius: 8,
-              ),
-            ),
-            child: Expanded(
-              child: Slider(
-                activeColor: Colors.black,
-                inactiveColor: Colors.grey[300],
-                value: provider.currentDuration.toDouble(),
-                min: 0.0,
-                max: provider.duration?.inSeconds.toDouble() ?? 100,
-                onChanged: (v) async {
-                  double position = v - provider.currentDuration;
-                  await provider.seek(position);
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Row(
-              children: [
-                Text(provider.timePlayed ?? "00:00"),
-                Spacer(),
-                Text(
-                  parseToMinutesSeconds(
-                    int.parse(playing?.duration?.toString() ?? "0"),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: Row(
+                          children: [
+                            Text("${hasHours ? "$hours:" : ""}$mins:$secs"),
+                            Spacer(),
+                            Text(
+                              "${hasHrDuration ? "${twoDigits(provider.duration?.inHours.remainder(60))}:" : ""}"
+                              "${twoDigits(provider.duration?.inMinutes.remainder(60))}:"
+                              "${twoDigits(provider.duration?.inSeconds.remainder(60))}",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
+                );
+              }),
           SizedBox(height: 30),
         ],
       ),
