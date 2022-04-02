@@ -126,6 +126,7 @@ class _SearchState extends State<Search> {
                   return GestureDetector(
                     onTap: () async {
                       await provider.playSong(song!);
+                      provider.setPlayingList([song]);
                     },
                     child: Container(
                       alignment: Alignment.center,
