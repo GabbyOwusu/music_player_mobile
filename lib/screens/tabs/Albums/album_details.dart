@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:music_streaming/constants/constants.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
@@ -40,11 +41,17 @@ class _AlbumDetailsState extends State<AlbumDetails>
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: false,
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+              leading: Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(top: 10, left: 10),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  iconSize: 18,
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
                 ),
               ),
               elevation: 0,
@@ -63,13 +70,15 @@ class _AlbumDetailsState extends State<AlbumDetails>
                           width: double.infinity,
                           height: double.infinity,
                           scale: 1.0,
-                          // filterQuality: ,
                           fit: BoxFit.cover,
                         )
-                      : Icon(
-                          Icons.music_note,
-                          size: 20,
-                          color: UiColors.blue,
+                      : IconButton(
+                          onPressed: null,
+                          icon: Image.asset(
+                            Constants.IMG_DISK,
+                            color: UiColors.blue,
+                            height: 50,
+                          ),
                         ),
                 ),
               ),
@@ -137,10 +146,13 @@ class _AlbumDetailsState extends State<AlbumDetails>
                   ...List.generate(
                     albumSongs.length,
                     (index) {
+                      print(albumSongs[index].track);
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 30),
                         child: SongTile(
-                          onTap: () => provider.setPlayingList(albumSongs),
+                          onTap: () {
+                            provider.setPlayingList(albumSongs);
+                          },
                           song: albumSongs[index],
                           leading: Container(
                             height: 50,
@@ -150,10 +162,13 @@ class _AlbumDetailsState extends State<AlbumDetails>
                               color: UiColors.blue.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
-                              Icons.music_note,
-                              color: UiColors.blue,
-                              size: 15,
+                            child: IconButton(
+                              onPressed: null,
+                              icon: Image.asset(
+                                Constants.IMG_DISK,
+                                color: UiColors.blue,
+                                height: 15,
+                              ),
                             ),
                           ),
                         ),
