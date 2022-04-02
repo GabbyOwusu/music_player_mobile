@@ -5,7 +5,7 @@ import 'package:music_streaming/constants/common.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/playlist_details.dart';
-import 'package:music_streaming/widgets/artwork_widget.dart';
+import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +22,7 @@ class _PlaylistState extends State<Playlist> {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<SongProvider>();
-    final playlist = p.playlist ?? [];
+    final playlist = p.playlist;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -84,14 +84,6 @@ class _PlaylistState extends State<Playlist> {
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(20),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.grey.withOpacity(0.2),
-                      //     offset: Offset(0, 30),
-                      //     blurRadius: 30,
-                      //     spreadRadius: -15,
-                      //   ),
-                      // ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,17 +160,7 @@ class _PlaylistState extends State<Playlist> {
               itemBuilder: (context, index) {
                 return index == 0
                     ? createPlayList(ontap: () {})
-                    : GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return PlayListDetails(playlist: playlist[index]);
-                            }),
-                          );
-                        },
-                        child: PlayListCard(playlist: playlist[index]),
-                      );
+                    : PlayListCard(playlist: playlist[index]);
               },
             ),
             SizedBox(height: 30),
@@ -254,64 +236,65 @@ class PlayListCard extends StatefulWidget {
 }
 
 class _PlayListCardState extends State<PlayListCard> {
+  Uint8List? art;
   late Future<Uint8List?> f;
+
+  void getArt() async {
+    final p = context.read<SongProvider>();
+    art = await p.artWork(id: widget.playlist.id, type: ArtworkType.PLAYLIST);
+  }
 
   @override
   void initState() {
-    f = OnAudioQuery().queryArtwork(
-      widget.playlist.id,
-      ArtworkType.PLAYLIST,
-      format: ArtworkFormat.JPEG,
-      size: 400,
-      quality: 100,
-    );
+    getArt();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(
-            color: UiColors.blue.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ArtworkWidget(
-            future: f,
-            artworkBorder: BorderRadius.circular(16),
-            nullArtworkWidget: Icon(
-              Icons.music_note,
-              color: UiColors.blue,
-              size: 15,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return PlayListDetails(
+              playlist: widget.playlist,
+              art: art,
+            );
+          }),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: UiColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
             ),
-            artworkWidth: double.infinity,
-            artworkHeight: double.infinity,
-            id: widget.playlist.id,
-            type: ArtworkType.AUDIO,
+            child: CoverArt(art: art),
           ),
-        ),
-        SizedBox(height: 10),
-        Text(
-          widget.playlist.playlist,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
+          SizedBox(height: 10),
+          Text(
+            widget.playlist.playlist,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        SizedBox(height: 5),
-        Text(
-          'Songs ${widget.playlist.numOfSongs}',
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: Colors.grey,
+          SizedBox(height: 5),
+          Text(
+            'Songs ${widget.playlist.numOfSongs}',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.grey,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
