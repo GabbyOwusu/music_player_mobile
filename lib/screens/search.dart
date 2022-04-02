@@ -51,7 +51,7 @@ class _SearchState extends State<Search> {
                   onchange: (data) {
                     if (data.isNotEmpty)
                       setState(() {
-                        songResults = provider.songs?.where((song) {
+                        songResults = provider.songs.where((song) {
                           return song.title.toLowerCase().contains(data) ||
                               song.artist!.toLowerCase().contains(data);
                         }).toList();
@@ -166,7 +166,7 @@ class _SearchState extends State<Search> {
                           ),
                         ),
                         trailing: Text(
-                          '${parseToMinutesSeconds(int.parse(song?.duration.toString() ?? "0"))}',
+                          '${parseDuration(int.parse(song?.duration.toString() ?? "0"))}',
                           style: TextStyle(
                             fontSize: 14,
                             color: playing ? Colors.blue : Colors.grey,
