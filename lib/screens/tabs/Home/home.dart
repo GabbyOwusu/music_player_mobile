@@ -104,22 +104,6 @@ class LastPlayedCard extends StatefulWidget {
 }
 
 class _LastPlayedCardState extends State<LastPlayedCard> {
-  // Uint8List? art;
-  // late Future<Uint8List?> f;
-
-  // void getArt() async {
-  //   final p = context.watch<SongProvider>();
-  //   final song = p.playing ?? p.recent ?? p.songs.first;
-  //   f = p.artWork(id: song.id, type: ArtworkType.AUDIO);
-  //   art = await f;
-  // }
-
-  // @override
-  // void didChangeDependencies() {
-  //   getArt();
-  //   super.didChangeDependencies();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
@@ -158,16 +142,6 @@ class _LastPlayedCardState extends State<LastPlayedCard> {
           child: Stack(
             children: [
               Center(child: CoverArt(art: provider.nowPlayingArt)),
-              // ArtworkWidget(
-              //   future: f,
-              //   size: 500,
-              //   keepOldArtwork: true,
-              //   artworkBorder: BorderRadius.circular(16),
-              //   artworkWidth: double.infinity,
-              //   artworkHeight: double.infinity,
-              //   id: res.id,
-              //   type: ArtworkType.AUDIO,
-              // ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: Column(
