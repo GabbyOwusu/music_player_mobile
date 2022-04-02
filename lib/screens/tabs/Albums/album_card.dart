@@ -1,8 +1,11 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/screens/tabs/Albums/album_details.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
+import 'package:music_streaming/widgets/helpers.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class AlbumCard extends StatefulWidget {
@@ -13,32 +16,53 @@ class AlbumCard extends StatefulWidget {
   }) : super(key: key);
 
   final AlbumModel? album;
-
   final VoidCallback? onTap;
 
   @override
   State<AlbumCard> createState() => _AlbumCardState();
 }
 
-class _AlbumCardState extends State<AlbumCard> {
-  late Future<Uint8List?> f;
-
+class _AlbumCardState extends State<AlbumCard>
+    with AutomaticKeepAliveClientMixin {
   @override
-  void initState() {
+  bool get wantKeepAlive => true;
+  Uint8List? art;
+  Future<Uint8List?>? f;
+
+  void getArt() async {
     f = OnAudioQuery().queryArtwork(
       widget.album?.id ?? 0,
       ArtworkType.ALBUM,
       format: ArtworkFormat.PNG,
-      size: 300,
+      size: 500,
       quality: 100,
     );
+    if (mounted) art = await f;
+  }
+
+  @override
+  void initState() {
     super.initState();
+    getArt();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: ((context) {
+              return AlbumDetails(
+                art: art,
+                album: widget.album!,
+              );
+            }),
+          ),
+        );
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -50,12 +74,8 @@ class _AlbumCardState extends State<AlbumCard> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: ArtworkWidget(
-              future: f,
+              future: f!,
               artworkBorder: BorderRadius.circular(16),
-              nullArtworkWidget: Icon(
-                Icons.music_note,
-                color: UiColors.blue,
-              ),
               artworkWidth: double.infinity,
               artworkHeight: double.infinity,
               id: widget.album?.id ?? 0,
