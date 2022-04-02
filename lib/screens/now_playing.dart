@@ -20,8 +20,8 @@ class NowPlaying extends StatefulWidget {
 
 class _NowPlayingState extends State<NowPlaying> {
   final iconMap = {
-    Loop.all: Icons.repeat_outlined,
-    Loop.repeat: Icons.repeat_one_outlined
+    Loop.all: Iconsax.repeat,
+    Loop.repeat: Iconsax.repeate_one,
   };
 
   void setLoop() {
@@ -61,7 +61,7 @@ class _NowPlayingState extends State<NowPlaying> {
         actions: [
           IconButton(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            icon: Icon(Iconsax.menu_1),
+            icon: Icon(Iconsax.music_filter),
             color: Colors.black,
             onPressed: () {
               showCupertinoModalBottomSheet(
@@ -279,6 +279,7 @@ class _AlbumSongs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.read<SongProvider>();
     return Scaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
@@ -327,7 +328,9 @@ class _AlbumSongs extends StatelessWidget {
             ),
             SizedBox(height: 10),
             ...List.generate(p?.length ?? 0, (index) {
-              return SongTile(song: (p ?? [])[index]);
+              return SongTile(
+                  onTap: () => provider.setPlayingList(p ?? []),
+                  song: (p ?? [])[index]);
             })
           ],
         ),
