@@ -14,11 +14,16 @@ class Artists extends StatefulWidget {
   _ArtistsState createState() => _ArtistsState();
 }
 
-class _ArtistsState extends State<Artists> {
+class _ArtistsState extends State<Artists> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final provider = context.watch<SongProvider>();
-    final artists = provider.artists ?? [];
+    final artists = provider.artists;
+
     return Container(
       height: 500,
       child: GridView.builder(
@@ -52,11 +57,7 @@ class ArtistCard extends StatefulWidget {
   State<ArtistCard> createState() => _ArtistCardState();
 }
 
-class _ArtistCardState extends State<ArtistCard>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
+class _ArtistCardState extends State<ArtistCard> {
   late Future<Uint8List?> f;
 
   @override
@@ -73,7 +74,6 @@ class _ArtistCardState extends State<ArtistCard>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return GestureDetector(
       onTap: () {},
       child: Column(
@@ -89,11 +89,11 @@ class _ArtistCardState extends State<ArtistCard>
             child: ArtworkWidget(
               future: f,
               artworkBorder: BorderRadius.circular(8),
-              nullArtworkWidget: Icon(
-                Icons.music_note,
-                size: 18,
-                color: UiColors.blue,
-              ),
+              // nullArtworkWidget: Icon(
+              //   Icons.music_note,
+              //   size: 18,
+              //   color: UiColors.blue,
+              // ),
               artworkWidth: double.infinity,
               artworkHeight: double.infinity,
               id: widget.artists.id,
