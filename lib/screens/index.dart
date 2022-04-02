@@ -38,7 +38,6 @@ class Index extends StatelessWidget {
     return DefaultTabController(
       length: tabs.length,
       child: Scaffold(
-        // extendBody: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
