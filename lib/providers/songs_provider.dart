@@ -49,11 +49,11 @@ class SongProvider extends Baseprovider {
 
   Future<void> initQuery() async {
     await requestPermission();
-    await getRecent();
     await getSongs();
     await getAlbums();
     await getArtists();
     await getPlayLists();
+    await getRecent();
     await recentArt();
   }
 
@@ -163,12 +163,6 @@ class SongProvider extends Baseprovider {
     }
   }
 
-  Future<void> setRecent(SongModel song) async {
-    try {
-      await _hiveService.setRecent(song.id.toString());
-    } catch (e) {}
-  }
-
   Future<SongModel?> getRecent() async {
     try {
       final res = await _hiveService.getRecent();
@@ -189,7 +183,7 @@ class SongProvider extends Baseprovider {
     if (audioPlayer?.playing == true) await disposePlayer();
     try {
       audioPlayer = AudioPlayer();
-      await setRecent(song);
+      await _hiveService.setRecent(song.id.toString());
       isPlaying = true;
       _nowPlaying = song;
       _duration = await audioPlayer?.setFilePath(File(song.data).path);
