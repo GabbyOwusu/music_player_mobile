@@ -9,16 +9,14 @@ import 'package:music_streaming/screens/tabs/Artists/artists.dart';
 import 'package:music_streaming/screens/tabs/Home/home.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_screen.dart';
 
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:music_streaming/widgets/coverArt.dart';
 
 import 'package:provider/provider.dart';
 
 import '../constants/ui_colors.dart';
 
 class Index extends StatelessWidget {
-  Index({
-    Key? key,
-  }) : super(key: key);
+  Index({Key? key}) : super(key: key);
 
   final tabMenu = [
     'Home',
@@ -40,6 +38,7 @@ class Index extends StatelessWidget {
     return DefaultTabController(
       length: tabs.length,
       child: Scaffold(
+        // extendBody: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
@@ -112,45 +111,52 @@ class Index extends StatelessWidget {
           ),
         ),
         body: TabBarView(children: tabs),
-        bottomNavigationBar: p.playing == null
-            ? null
-            : PlayingCard(
-                playing: p.playing,
-                onTap: () {
-                  showCupertinoModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return NowPlaying();
-                    },
-                  );
-                },
-              ),
+        bottomNavigationBar: p.playing == null ? null : PlayingCard(),
       ),
     );
   }
 }
 
 class PlayingCard extends StatefulWidget {
-  const PlayingCard({
-    Key? key,
-    this.onTap,
-    required this.playing,
-  }) : super(key: key);
-
-  final VoidCallback? onTap;
-  final SongModel? playing;
+  const PlayingCard({Key? key}) : super(key: key);
 
   @override
   State<PlayingCard> createState() => _PlayingCardState();
 }
 
 class _PlayingCardState extends State<PlayingCard> {
+  // void getArt() async {
+  //   final p = context.watch<SongProvider>();
+  //   final playing = p.playing;
+  //   f = OnAudioQuery().queryArtwork(
+  //     playing?.id ?? 0,
+  //     ArtworkType.AUDIO,
+  //     format: ArtworkFormat.JPEG,
+  //     size: 800,
+  //     quality: 100,
+  //   );
+  //   art = await f;
+  // }
+
+  // @override
+  // void didChangeDependencies() {
+  //   getArt();
+  //   super.didChangeDependencies();
+  // }
+
   @override
   Widget build(BuildContext context) {
     final p = context.watch<SongProvider>();
     final playing = p.playing;
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        showCupertinoModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return NowPlaying();
+          },
+        );
+      },
       child: Container(
         height: 70,
         width: double.infinity,
@@ -182,18 +188,9 @@ class _PlayingCardState extends State<PlayingCard> {
                 color: UiColors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: QueryArtworkWidget(
-                keepOldArtwork: true,
-                artworkBorder: BorderRadius.circular(10),
-                nullArtworkWidget: Icon(
-                  Icons.music_note,
-                  color: UiColors.blue,
-                  size: 15,
-                ),
-                artworkWidth: double.infinity,
-                artworkHeight: double.infinity,
-                id: playing?.id ?? 0,
-                type: ArtworkType.AUDIO,
+              child: CoverArt(
+                radius: BorderRadius.circular(10),
+                art: p.nowPlayingArt,
               ),
             ),
             SizedBox(width: 10),
