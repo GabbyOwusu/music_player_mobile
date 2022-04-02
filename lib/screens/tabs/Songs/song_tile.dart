@@ -25,28 +25,26 @@ class SongTile extends StatefulWidget {
   State<SongTile> createState() => _SongTileState();
 }
 
-class _SongTileState extends State<SongTile> {
+class _SongTileState extends State<SongTile>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   late Future<Uint8List?> f;
 
   @override
   void initState() {
-    try {
-      f = OnAudioQuery().queryArtwork(
-        widget.song?.id ?? 0,
-        ArtworkType.AUDIO,
-        format: ArtworkFormat.JPEG,
-        size: 200,
-        quality: 100,
-      );
-    } catch (e) {}
+    final p = context.read<SongProvider>();
+    f = p.artWork(id: widget.song?.id ?? 0, type: ArtworkType.AUDIO);
     super.initState();
   }
 
+  Duration get duration => Duration(milliseconds: widget.song?.duration ?? 0);
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final p = context.watch<SongProvider>();
-    final playing = p.playing?.title == widget.song?.title &&
-        p.playing?.artist == widget.song?.artist;
+    final playing = p.playing?.id == widget.song?.id;
 
     return GestureDetector(
       onTap: () async {
@@ -68,11 +66,6 @@ class _SongTileState extends State<SongTile> {
                 child: ArtworkWidget(
                   future: f,
                   artworkBorder: BorderRadius.circular(16),
-                  nullArtworkWidget: Icon(
-                    Icons.music_note,
-                    color: UiColors.blue,
-                    size: 15,
-                  ),
                   artworkWidth: double.infinity,
                   artworkHeight: double.infinity,
                   id: widget.song?.id ?? 0,
@@ -98,7 +91,7 @@ class _SongTileState extends State<SongTile> {
             ),
           ),
           trailing: Text(
-            '${parseToMinutesSeconds(int.parse(widget.song?.duration.toString() ?? "0"))}',
+            '${parseDuration(widget.song?.duration ?? 0)}',
             style: TextStyle(
               fontSize: 14,
               color: playing ? Colors.blue : Colors.grey,
