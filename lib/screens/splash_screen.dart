@@ -40,10 +40,12 @@ class _SplashState extends State<Splash> {
   // }
 
   void _navigate() async {
+    final p = context.read<SongProvider>();
     await Future.delayed(Duration(milliseconds: 500));
     setState(() => visible = true);
     await Future.delayed(Duration(seconds: 3));
-    await context.read<SongProvider>().initQuery();
+    await p.initQuery();
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
