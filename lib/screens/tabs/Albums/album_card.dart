@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/screens/tabs/Albums/album_details.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
-import 'package:music_streaming/widgets/helpers.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class AlbumCard extends StatefulWidget {
