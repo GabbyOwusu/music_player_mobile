@@ -125,25 +125,6 @@ class PlayingCard extends StatefulWidget {
 }
 
 class _PlayingCardState extends State<PlayingCard> {
-  // void getArt() async {
-  //   final p = context.watch<SongProvider>();
-  //   final playing = p.playing;
-  //   f = OnAudioQuery().queryArtwork(
-  //     playing?.id ?? 0,
-  //     ArtworkType.AUDIO,
-  //     format: ArtworkFormat.JPEG,
-  //     size: 800,
-  //     quality: 100,
-  //   );
-  //   art = await f;
-  // }
-
-  // @override
-  // void didChangeDependencies() {
-  //   getArt();
-  //   super.didChangeDependencies();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final p = context.watch<SongProvider>();
