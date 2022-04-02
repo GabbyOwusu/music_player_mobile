@@ -10,6 +10,10 @@ A music player built with flutter
 - Pause song
 - Resume song
 - Search songs
+- Loop songs
+- Shuffle songs
+- Skip (previous and next)
+- Keep in background
 - Create a mix of songs [In_progress]
 
 

@@ -17,8 +17,9 @@ class _SongsState extends State<Songs> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     final provider = context.watch<SongProvider>();
-    final songs = provider.songs ?? [];
+    final songs = provider.songs;
 
     return SizedBox(
       height: 500,
@@ -29,7 +30,10 @@ class _SongsState extends State<Songs> with AutomaticKeepAliveClientMixin {
         physics: BouncingScrollPhysics(),
         itemCount: songs.length,
         itemBuilder: (context, index) {
-          return SongTile(song: songs[index]);
+          return SongTile(
+            onTap: () => provider.setPlayingList(songs),
+            song: songs[index],
+          );
         },
       ),
     );

@@ -24,6 +24,7 @@ class _LyricsState extends State<Lyrics> {
           children: [
             Text(
               playing?.album ?? 'Unknown',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 13,
@@ -32,6 +33,7 @@ class _LyricsState extends State<Lyrics> {
             SizedBox(height: 5),
             Text(
               playing?.title ?? 'Unknown',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 20,

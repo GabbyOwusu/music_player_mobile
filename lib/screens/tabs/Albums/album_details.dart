@@ -1,44 +1,38 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:music_streaming/constants/constants.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
-import 'package:music_streaming/widgets/artwork_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
 class AlbumDetails extends StatefulWidget {
   final AlbumModel album;
-  const AlbumDetails({Key? key, required this.album}) : super(key: key);
+  final Uint8List? art;
+  const AlbumDetails({
+    Key? key,
+    required this.album,
+    required this.art,
+  }) : super(key: key);
 
   @override
   _AlbumDetailsState createState() => _AlbumDetailsState();
 }
 
-class _AlbumDetailsState extends State<AlbumDetails> {
-  late Future<Uint8List?> f;
-
+class _AlbumDetailsState extends State<AlbumDetails>
+    with AutomaticKeepAliveClientMixin {
   @override
-  void initState() {
-    context.read<SongProvider>().getalbumSongs(
-          type: AudiosFromType.ALBUM_ID,
-          id: widget.album.id.toString(),
-        );
-    f = OnAudioQuery().queryArtwork(
-      widget.album.id,
-      ArtworkType.ALBUM,
-      format: ArtworkFormat.PNG,
-      size: 500,
-      quality: 100,
-    );
-    super.initState();
-  }
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final provider = context.watch<SongProvider>();
-    final albumSongs = provider.albumSongs ?? [];
+    final albumSongs =
+        provider.songs.where((s) => s.album == widget.album.album).toList();
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -47,11 +41,17 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: false,
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+              leading: Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(top: 10, left: 10),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  iconSize: 18,
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
                 ),
               ),
               elevation: 0,
@@ -64,23 +64,22 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   decoration: BoxDecoration(
                     color: UiColors.blue.withOpacity(0.1),
                   ),
-                  child: ArtworkWidget(
-                    future: f,
-                    format: ArtworkFormat.PNG,
-                    size: 1080,
-                    quality: 100,
-                    artworkQuality: FilterQuality.high,
-                    artworkBorder: BorderRadius.circular(0),
-                    nullArtworkWidget: Icon(
-                      Icons.music_note,
-                      size: 20,
-                      color: UiColors.blue,
-                    ),
-                    artworkWidth: double.infinity,
-                    artworkHeight: double.infinity,
-                    id: widget.album.id,
-                    type: ArtworkType.ALBUM,
-                  ),
+                  child: widget.art != null
+                      ? Image.memory(
+                          widget.art!,
+                          width: double.infinity,
+                          height: double.infinity,
+                          scale: 1.0,
+                          fit: BoxFit.cover,
+                        )
+                      : IconButton(
+                          onPressed: null,
+                          icon: Image.asset(
+                            Constants.IMG_DISK,
+                            color: UiColors.blue,
+                            height: 50,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -130,11 +129,15 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                             color: Colors.blue,
                           ),
                           child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.play_arrow_rounded,
-                                color: Colors.white,
-                              )),
+                            onPressed: () {
+                              // provider.playSong(albumSongs.first);
+                              // provider.setPlayingList(albumSongs);
+                            },
+                            icon: Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
                         )
                       ],
                     ),
@@ -143,9 +146,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   ...List.generate(
                     albumSongs.length,
                     (index) {
+                      print(albumSongs[index].track);
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 30),
                         child: SongTile(
+                          onTap: () {
+                            provider.setPlayingList(albumSongs);
+                          },
                           song: albumSongs[index],
                           leading: Container(
                             height: 50,
@@ -155,10 +162,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                               color: UiColors.blue.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
-                              Icons.music_note,
-                              color: UiColors.blue,
-                              size: 15,
+                            child: IconButton(
+                              onPressed: null,
+                              icon: Image.asset(
+                                Constants.IMG_DISK,
+                                color: UiColors.blue,
+                                height: 15,
+                              ),
                             ),
                           ),
                         ),

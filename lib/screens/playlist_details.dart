@@ -2,42 +2,37 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
-import 'package:music_streaming/widgets/artwork_widget.dart';
+import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
 import 'tabs/Songs/song_tile.dart';
 
 class PlayListDetails extends StatefulWidget {
+  final Uint8List? art;
   final PlaylistModel playlist;
-  const PlayListDetails({Key? key, required this.playlist}) : super(key: key);
+  const PlayListDetails({Key? key, required this.playlist, required this.art})
+      : super(key: key);
 
   @override
   _PlayListDetailsState createState() => _PlayListDetailsState();
 }
 
 class _PlayListDetailsState extends State<PlayListDetails> {
-  late Future<Uint8List?> f;
+  // late Future<Uint8List?> f;
 
   @override
   void initState() {
-    context.read<SongProvider>().getPlaylistSongs(
-          widget.playlist.id.toString(),
-        );
-    f = OnAudioQuery().queryArtwork(
-      widget.playlist.id,
-      ArtworkType.PLAYLIST,
-      format: ArtworkFormat.PNG,
-      size: 500,
-      quality: 100,
-    );
+    final p = context.read<SongProvider>();
+    p.getPlaylistSongs(widget.playlist.id.toString());
+    // f = p.artWork(id: widget.playlist.id, type: ArtworkType.PLAYLIST);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final albumSongs = provider.playlistSongs ?? [];
+    final albumSongs = provider.playlistSongs;
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -48,10 +43,7 @@ class _PlayListDetailsState extends State<PlayListDetails> {
               automaticallyImplyLeading: false,
               leading: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                ),
+                icon: Icon(Icons.arrow_back, color: Colors.black),
               ),
               elevation: 0,
               floating: true,
@@ -61,19 +53,7 @@ class _PlayListDetailsState extends State<PlayListDetails> {
                 background: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(color: Colors.grey),
-                  child: ArtworkWidget(
-                    future: f,
-                    format: ArtworkFormat.PNG,
-                    size: 1080,
-                    quality: 100,
-                    artworkQuality: FilterQuality.high,
-                    artworkBorder: BorderRadius.circular(0),
-                    nullArtworkWidget: Icon(Icons.music_note),
-                    artworkWidth: double.infinity,
-                    artworkHeight: double.infinity,
-                    id: widget.playlist.id,
-                    type: ArtworkType.PLAYLIST,
-                  ),
+                  child: CoverArt(art: widget.art, size: 50),
                 ),
               ),
             ),

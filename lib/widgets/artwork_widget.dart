@@ -15,6 +15,8 @@ Copyright: © 2021, Lucas Josino. All rights reserved.
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:music_streaming/constants/constants.dart';
+import 'package:music_streaming/constants/ui_colors.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 /// Widget that will help to "query" artwork for song/album.
@@ -161,8 +163,6 @@ class ArtworkWidget extends StatelessWidget {
   ///
   /// Important:
   ///
-  /// * If [nullArtworkWidget] is null, will be set to [image_not_supported] icon.
-  final Widget? nullArtworkWidget;
 
   /// A builder function that is called if an error occurs during image loading.
   ///
@@ -270,7 +270,6 @@ class ArtworkWidget extends StatelessWidget {
     this.artworkColor,
     this.artworkBlendMode,
     this.keepOldArtwork,
-    this.nullArtworkWidget,
     this.errorBuilder,
     this.frameBuilder,
     required this.future,
@@ -304,20 +303,26 @@ class ArtworkWidget extends StatelessWidget {
               frameBuilder: frameBuilder,
               errorBuilder: errorBuilder ??
                   (context, exception, stackTrace) {
-                    return nullArtworkWidget ??
-                        const Icon(
-                          Icons.image_not_supported,
-                          size: 50,
-                        );
+                    return IconButton(
+                      onPressed: null,
+                      icon: Image.asset(
+                        Constants.IMG_DISK,
+                        height: 20,
+                        color: UiColors.blue,
+                      ),
+                    );
                   },
             ),
           );
         }
-        return nullArtworkWidget ??
-            const Icon(
-              Icons.image_not_supported,
-              size: 50,
-            );
+        return IconButton(
+          onPressed: null,
+          icon: Image.asset(
+            Constants.IMG_DISK,
+            height: 20,
+            color: UiColors.blue,
+          ),
+        );
       },
     );
   }

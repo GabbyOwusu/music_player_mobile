@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/ui_colors.dart';
@@ -8,6 +6,8 @@ import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/now_playing.dart';
 import 'package:music_streaming/screens/playlists.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
+
+import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:music_streaming/widgets/helpers.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -27,29 +27,13 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
-  late Future<Uint8List?> f;
-
-  @override
-  void initState() {
-    final p = context.read<SongProvider>();
-    try {
-      f = OnAudioQuery().queryArtwork(
-        p.playing?.id ?? 0,
-        ArtworkType.AUDIO,
-        format: ArtworkFormat.JPEG,
-        size: 200,
-        quality: 100,
-      );
-    } catch (e) {}
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final provider = context.watch<SongProvider>();
-    final songs = provider.songs ?? [];
+    final songs = provider.songs;
     final recents = songs.length > 3 ? songs.getRange(0, 8) : songs;
+
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: Column(
@@ -64,17 +48,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             ),
           ),
           SizedBox(height: 15),
-          GestureDetector(
-            onTap: () {
-              showCupertinoModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return NowPlaying();
-                },
-              );
-            },
-            child: LastPlayedCard(),
-          ),
+          LastPlayedCard(),
           SizedBox(height: 50),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 30),
@@ -82,10 +56,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
               children: [
                 Text(
                   'Recently added',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 17,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
                 ),
                 Spacer(),
                 GestureDetector(
@@ -109,7 +80,10 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             builder: (index, data) {
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
-                child: SongTile(song: data),
+                child: SongTile(
+                  onTap: () => provider.setPlayingList(recents.toList()),
+                  song: data,
+                ),
               );
             },
           ),
@@ -133,128 +107,121 @@ class _LastPlayedCardState extends State<LastPlayedCard> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final res =
-        provider.playing ?? provider.recent ?? (provider.songs ?? []).first;
-    return Container(
-      height: 200,
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 30),
-      decoration: BoxDecoration(
-        color: UiColors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            offset: Offset(0, 30),
-            blurRadius: 30,
-            spreadRadius: -15,
-          ),
-        ],
-      ),
+    final res = provider.playing ?? provider.recent ?? provider.songs.first;
+    return GestureDetector(
+      onTap: () {
+        showCupertinoModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return NowPlaying();
+          },
+        );
+      },
       child: Container(
         height: 200,
         width: double.infinity,
+        margin: EdgeInsets.symmetric(horizontal: 30),
         decoration: BoxDecoration(
+          color: UiColors.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
-        ),
-        child: Stack(
-          children: [
-            QueryArtworkWidget(
-              size: 500,
-              keepOldArtwork: true,
-              artworkBorder: BorderRadius.circular(16),
-              nullArtworkWidget: Padding(
-                padding: EdgeInsets.only(left: 20, top: 20),
-                child: Icon(
-                  Icons.music_note,
-                  color: UiColors.blue,
-                  size: 15,
-                ),
-              ),
-              artworkWidth: double.infinity,
-              artworkHeight: double.infinity,
-              id: res.id,
-              type: ArtworkType.AUDIO,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text(
-                        '${parseToMinutesSeconds(res.duration ?? 0)}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${res.artist}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              '${res.title}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          if (provider.playing == null) {
-                            provider.playSong(res);
-                            return;
-                          } else
-                            provider.isPlaying == true
-                                ? provider.pauseSong()
-                                : provider.resume();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            provider.isPlaying == true
-                                ? Icons.pause_rounded
-                                : Icons.play_arrow_rounded,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              offset: Offset(0, 30),
+              blurRadius: 30,
+              spreadRadius: -15,
             ),
           ],
+        ),
+        child: Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Stack(
+            children: [
+              Center(child: CoverArt(art: provider.nowPlayingArt)),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          '${parseDuration(res.duration ?? 0)}',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${res.artist}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                '${res.title}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (provider.playing == null) {
+                              provider.playSong(res);
+                              return;
+                            } else
+                              provider.isPlaying == true
+                                  ? provider.pauseSong()
+                                  : provider.resume();
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              provider.isPlaying == true
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

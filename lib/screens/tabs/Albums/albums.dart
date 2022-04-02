@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Albums/album_card.dart';
-import 'package:music_streaming/screens/tabs/Albums/album_details.dart';
 import 'package:provider/provider.dart';
 
 class Albums extends StatefulWidget {
@@ -19,7 +18,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     super.build(context);
     final provider = context.watch<SongProvider>();
-    final albums = provider.albums ?? [];
+    final albums = provider.albums;
 
     return Container(
       height: 500,
@@ -35,19 +34,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
           mainAxisSpacing: 20,
         ),
         itemBuilder: (context, index) {
-          return AlbumCard(
-            album: albums[index],
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return AlbumDetails(album: albums[index]);
-                  },
-                ),
-              );
-            },
-          );
+          return AlbumCard(album: albums[index]);
         },
       ),
     );

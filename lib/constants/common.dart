@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+String twoDigits(int? n) => n.toString().padLeft(2, "0");
+
 class CustomForm extends StatelessWidget {
   final String? hint;
   final Function(String)? onchange;
@@ -37,14 +39,14 @@ class CustomForm extends StatelessWidget {
   }
 }
 
-String parseToMinutesSeconds(int ms) {
+String parseDuration(int ms) {
   String data;
   Duration duration = Duration(milliseconds: ms);
-  int minutes = duration.inMinutes;
-  int seconds = (duration.inSeconds) - (minutes * 60);
-  data = minutes.toString() + ":";
-  if (seconds <= 9) data += "0";
-  data += seconds.toString();
+  bool hasHours = duration.inHours > 0;
+  final minutes = duration.inMinutes.remainder(60);
+  final seconds = duration.inSeconds.remainder(60);
+  final hours = duration.inHours.remainder(60);
+  data = "${hasHours ? "$hours:" : ""}$minutes:$seconds";
   return data;
 }
 

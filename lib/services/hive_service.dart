@@ -4,6 +4,8 @@ import 'package:path_provider/path_provider.dart';
 class HiveKeys {
   static const BOX = "music_player";
   static const RECENT = "recent_played";
+  static const SONGSART = "SONGS_ART";
+  static const ALBUMSART = "ALBUMS_ART";
 }
 
 class HiveService {
