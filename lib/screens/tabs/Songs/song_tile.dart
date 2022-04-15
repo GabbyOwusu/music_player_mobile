@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,7 @@ import '../../../widgets/artwork_widget.dart';
 
 class SongTile extends StatefulWidget {
   final Widget? leading;
+  final Widget? trailing;
   final SongModel? song;
   final Function()? onTap;
 
@@ -19,22 +20,24 @@ class SongTile extends StatefulWidget {
     this.onTap,
     this.song,
     this.leading,
+    this.trailing,
   }) : super(key: key);
 
   @override
   State<SongTile> createState() => _SongTileState();
 }
 
-class _SongTileState extends State<SongTile>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+class _SongTileState extends State<SongTile> {
   late Future<Uint8List?> f;
 
   @override
   void initState() {
     final p = context.read<SongProvider>();
-    f = p.artWork(id: widget.song?.id ?? 0, type: ArtworkType.AUDIO);
+    f = p.artWork(
+      id: widget.song?.id ?? 0,
+      type: ArtworkType.AUDIO,
+      size: 150,
+    );
     super.initState();
   }
 
@@ -42,10 +45,8 @@ class _SongTileState extends State<SongTile>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final p = context.watch<SongProvider>();
     final playing = p.playing?.id == widget.song?.id;
-
     return GestureDetector(
       onTap: () async {
         await p.playSong(widget.song!);
@@ -65,6 +66,7 @@ class _SongTileState extends State<SongTile>
                 width: 50,
                 child: ArtworkWidget(
                   future: f,
+                  keepOldArtwork: true,
                   artworkBorder: BorderRadius.circular(16),
                   artworkWidth: double.infinity,
                   artworkHeight: double.infinity,
@@ -90,13 +92,14 @@ class _SongTileState extends State<SongTile>
               color: playing ? Colors.blue : Colors.grey,
             ),
           ),
-          trailing: Text(
-            '${parseDuration(widget.song?.duration ?? 0)}',
-            style: TextStyle(
-              fontSize: 14,
-              color: playing ? Colors.blue : Colors.grey,
-            ),
-          ),
+          trailing: widget.trailing ??
+              Text(
+                '${parseDuration(widget.song?.duration ?? 0)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: playing ? Colors.blue : Colors.grey,
+                ),
+              ),
         ),
       ),
     );
