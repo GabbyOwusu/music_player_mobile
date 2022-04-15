@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/constants.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -21,17 +21,15 @@ class AlbumDetails extends StatefulWidget {
   _AlbumDetailsState createState() => _AlbumDetailsState();
 }
 
-class _AlbumDetailsState extends State<AlbumDetails>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
+class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final provider = context.watch<SongProvider>();
-    final albumSongs =
-        provider.songs.where((s) => s.album == widget.album.album).toList();
+    final p = provider.songs.where((s) {
+      return s.album == widget.album.album;
+    }).toList();
+
+    final albumSongs = p..sort(((a, b) => a.track!.compareTo(b.track!)));
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -146,7 +144,6 @@ class _AlbumDetailsState extends State<AlbumDetails>
                   ...List.generate(
                     albumSongs.length,
                     (index) {
-                      print(albumSongs[index].track);
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 30),
                         child: SongTile(
