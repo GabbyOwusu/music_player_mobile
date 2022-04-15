@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/lyrics_screen.dart';
 import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
@@ -40,9 +40,11 @@ class _NowPlayingState extends State<NowPlaying> {
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
     final playing = provider.playing ?? provider.recent;
-    final albumSongs = provider.songs.where((s) {
+    final p = provider.songs.where((s) {
       return s.album == playing?.album;
     }).toList();
+
+    final albumSongs = p..sort(((a, b) => a.track!.compareTo(b.track!)));
 
     return Scaffold(
       appBar: AppBar(
@@ -228,7 +230,7 @@ class _NowPlayingState extends State<NowPlaying> {
                     children: [
                       SliderTheme(
                         data: SliderThemeData(
-                          trackHeight: 1,
+                          trackHeight: 2,
                           thumbShape: RoundSliderThumbShape(
                             enabledThumbRadius: 8,
                           ),
@@ -240,9 +242,7 @@ class _NowPlayingState extends State<NowPlaying> {
                             value: (data?.inSeconds ?? 0).toDouble(),
                             min: 0.0,
                             max: provider.duration?.inSeconds.toDouble() ?? 1,
-                            onChanged: (v) async {
-                              await provider.seek(v);
-                            },
+                            onChanged: (v) async => await provider.seek(v),
                           ),
                         ),
                       ),
@@ -329,8 +329,22 @@ class _AlbumSongs extends StatelessWidget {
             SizedBox(height: 10),
             ...List.generate(p?.length ?? 0, (index) {
               return SongTile(
-                  onTap: () => provider.setPlayingList(p ?? []),
-                  song: (p ?? [])[index]);
+                leading: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: UiColors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: CoverArt(
+                    size: 20,
+                    art: provider.nowPlayingArt,
+                    radius: BorderRadius.circular(16),
+                  ),
+                ),
+                onTap: () => provider.setPlayingList(p ?? []),
+                song: (p ?? [])[index],
+              );
             })
           ],
         ),
