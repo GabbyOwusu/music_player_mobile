@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/now_playing.dart';
@@ -12,8 +14,7 @@ import 'package:music_streaming/screens/tabs/Songs/song_screen.dart';
 import 'package:music_streaming/widgets/coverArt.dart';
 
 import 'package:provider/provider.dart';
-
-import '../constants/ui_colors.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 class Index extends StatelessWidget {
   Index({Key? key}) : super(key: key);
@@ -69,7 +70,8 @@ class Index extends StatelessWidget {
                 color: Colors.grey[100],
               ),
               child: IconButton(
-                icon: Image.asset('images/search.png', width: 20),
+                color: Colors.black,
+                icon: Icon(Iconsax.search_favorite),
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 focusColor: Colors.transparent,
@@ -141,9 +143,9 @@ class _PlayingCardState extends State<PlayingCard> {
         height: 70,
         width: double.infinity,
         margin: EdgeInsets.only(
-          left: 30,
-          right: 30,
-          bottom: 20,
+          left: 20,
+          right: 20,
+          bottom: 10,
           top: 10,
         ),
         decoration: BoxDecoration(
@@ -158,69 +160,93 @@ class _PlayingCardState extends State<PlayingCard> {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: UiColors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: CoverArt(
-                radius: BorderRadius.circular(10),
-                art: p.nowPlayingArt,
-              ),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 14),
+          leading: Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              color: UiColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            SizedBox(width: 10),
-            Expanded(
-              flex: 5,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    playing?.artist ?? 'No media',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 3),
-                  Text(
-                    playing?.title ?? 'No media',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
+            child: CoverArt(
+              radius: BorderRadius.circular(10),
+              art: p.nowPlayingArt,
             ),
-            Spacer(),
-            GestureDetector(
-              onTap: () {
-                p.isPlaying == true ? p.pauseSong() : p.resume();
-              },
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  p.isPlaying == true
-                      ? Icons.pause_rounded
-                      : Icons.play_arrow_rounded,
-                  size: 20,
+          ),
+          title: Text(
+            playing?.artist ?? 'No media',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+          ),
+          subtitle: TextScroll(
+            playing?.title ?? 'No media',
+            velocity: Velocity(
+              pixelsPerSecond: Offset(40, 0),
+            ),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: Colors.black,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => p.skip(prev: true),
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.skip_previous_rounded,
+                    size: 18,
+                    color: Colors.black,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 20),
-          ],
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => p.isPlaying == true ? p.pauseSong() : p.resume(),
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: UiColors.blue.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    p.isPlaying == true
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                    size: 20,
+                    color: UiColors.blue,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => p.skip(next: true),
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.skip_next_rounded,
+                    size: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
