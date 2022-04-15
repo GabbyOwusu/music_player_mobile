@@ -28,6 +28,7 @@ class SongProvider extends Baseprovider {
   List<SongModel> _albumSongs = [];
   List<ArtistModel> _artistList = [];
   List<PlaylistModel> _playList = [];
+  List<SongModel> _genreSongs = [];
   bool isPlaying = false;
   SongModel? _nowPlaying;
   Loop _currentLoop = Loop.all;
@@ -38,6 +39,7 @@ class SongProvider extends Baseprovider {
   List<PlaylistModel> get playlist => _playList;
   List<ArtistModel> get artists => _artistList;
   List<SongModel> get playlistSongs => _playListSongs;
+  List<SongModel> get genres => _genreSongs;
   SongModel? get playing => _nowPlaying;
   int get currentDuration => _currentDuration;
   Duration? get duration => _duration;
@@ -89,6 +91,26 @@ class SongProvider extends Baseprovider {
     }
   }
 
+  Future<List<SongModel>?> genreSongs(String genre) async {
+    try {
+      final res = await audioQuery.queryWithFilters(
+        genre,
+        WithFiltersType.GENRES,
+      );
+      final d = res.toGenreModel();
+      _genreSongs.clear();
+      final p = await audioQuery.queryAudiosFrom(
+        AudiosFromType.GENRE,
+        d.first.genre,
+      );
+      _genreSongs.addAll(p);
+      notifyListeners();
+      return _genreSongs;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> requestPermission() async {
     try {
       final status = await audioQuery.permissionsStatus();
@@ -131,12 +153,13 @@ class SongProvider extends Baseprovider {
   Future<Uint8List?> artWork({
     required int id,
     required ArtworkType type,
+    int? size,
   }) async {
     final res = await audioQuery.queryArtwork(
       id,
       ArtworkType.AUDIO,
       format: ArtworkFormat.JPEG,
-      size: 600,
+      size: size ?? 600,
       quality: 100,
     );
     return res;
@@ -157,6 +180,7 @@ class SongProvider extends Baseprovider {
     try {
       List<PlaylistModel> playlists = await audioQuery.queryPlaylists();
       _playList = playlists;
+      notifyListeners();
       return playlists;
     } catch (e) {
       return null;
@@ -172,6 +196,27 @@ class SongProvider extends Baseprovider {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<bool?> createPlaylist(String name) async {
+    await requestPermission();
+    try {
+      final res = await audioQuery.createPlaylist(name);
+      await getPlayLists();
+      notifyListeners();
+      return res;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  void addToPlaylist(List<SongModel> songs, int playListId) async {
+    try {
+      songs.forEach((song) async {
+        await audioQuery.addToPlaylist(song.id, playListId);
+      });
+      await getPlayLists();
+    } catch (e) {}
   }
 
   void setLoopMode(Loop loop) {
@@ -264,11 +309,9 @@ class SongProvider extends Baseprovider {
         _nowPlaying =
             next ? shuffled[_currentIndex += 1] : shuffled[_currentIndex -= 1];
       }
-    } on RangeError catch (e) {
+    } on RangeError catch (_) {
       _nowPlaying = _nowPlaying;
-      print(e);
     } catch (e) {
-      print("Error $e");
     } finally {
       await playSong(_nowPlaying!);
       notifyListeners();

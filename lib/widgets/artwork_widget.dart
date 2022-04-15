@@ -16,7 +16,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/constants.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 /// Widget that will help to "query" artwork for song/album.

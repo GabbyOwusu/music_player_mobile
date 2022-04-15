@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/now_playing.dart';
@@ -44,7 +44,10 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             padding: EdgeInsets.only(left: 30),
             child: Text(
               'Last played',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+              ),
             ),
           ),
           SizedBox(height: 15),

@@ -371,6 +371,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.8"
+  text_scroll:
+    dependency: "direct main"
+    description:
+      name: text_scroll
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   typed_data:
     dependency: transitive
     description:

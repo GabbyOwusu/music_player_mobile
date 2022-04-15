@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -133,7 +133,10 @@ class _SearchState extends State<Search> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
-                          decoration: BoxDecoration(color: UiColors.grey),
+                          decoration: BoxDecoration(
+                            color: UiColors.grey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           height: 50,
                           width: 50,
                           child: QueryArtworkWidget(

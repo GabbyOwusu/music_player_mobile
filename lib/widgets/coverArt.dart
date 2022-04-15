@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/constants/constants.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 
 class CoverArt extends StatelessWidget {
   final Uint8List? art;
@@ -22,6 +22,7 @@ class CoverArt extends StatelessWidget {
             borderRadius: radius ?? BorderRadius.circular(20),
             child: Image.memory(
               art!,
+              gaplessPlayback: true,
               width: double.infinity,
               height: double.infinity,
               scale: 1.0,

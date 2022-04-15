@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-String twoDigits(int? n) => n.toString().padLeft(2, "0");
+String twoDigits(int? n) {
+  return (n ?? 00).toString().padLeft(2, "0");
+}
 
 class CustomForm extends StatelessWidget {
   final String? hint;
@@ -46,15 +48,9 @@ String parseDuration(int ms) {
   final minutes = duration.inMinutes.remainder(60);
   final seconds = duration.inSeconds.remainder(60);
   final hours = duration.inHours.remainder(60);
-  data = "${hasHours ? "$hours:" : ""}$minutes:$seconds";
+  data =
+      "${hasHours ? "${twoDigits(hours)}:" : ""}${twoDigits(minutes)}:${twoDigits(seconds)}";
   return data;
-}
-
-double convertToDouble(String value) {
-  var myDouble = double.parse(value);
-  print(myDouble);
-  print(myDouble.runtimeType);
-  return myDouble;
 }
 
 Widget playArrow = Image.asset(

@@ -1,35 +1,36 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:music_streaming/constants/constants.dart';
 import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
-import 'package:music_streaming/screens/tabs/Songs/song_tile.dart';
+import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+
 import 'package:provider/provider.dart';
 
-class AlbumDetails extends StatefulWidget {
-  final AlbumModel album;
-  final Uint8List? art;
-  const AlbumDetails({
+class MixDetails extends StatefulWidget {
+  final String genre;
+  final String art;
+  const MixDetails({
     Key? key,
-    required this.album,
+    required this.genre,
     required this.art,
   }) : super(key: key);
 
   @override
-  _AlbumDetailsState createState() => _AlbumDetailsState();
+  _MixDetailsState createState() => _MixDetailsState();
 }
 
-class _AlbumDetailsState extends State<AlbumDetails> {
+class _MixDetailsState extends State<MixDetails> {
+  @override
+  void initState() {
+    final p = context.read<SongProvider>();
+    p.genreSongs(widget.genre);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final p = provider.songs.where((s) {
-      return s.album == widget.album.album;
-    }).toList();
-
-    final albumSongs = p..sort(((a, b) => a.track!.compareTo(b.track!)));
+    final songs = provider.genres;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -61,23 +62,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: UiColors.blue.withOpacity(0.1),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage(widget.art),
+                    ),
                   ),
-                  child: widget.art != null
-                      ? Image.memory(
-                          widget.art!,
-                          width: double.infinity,
-                          height: double.infinity,
-                          scale: 1.0,
-                          fit: BoxFit.cover,
-                        )
-                      : IconButton(
-                          onPressed: null,
-                          icon: Image.asset(
-                            Constants.IMG_DISK,
-                            color: UiColors.blue,
-                            height: 50,
-                          ),
-                        ),
                 ),
               ),
             ),
@@ -98,7 +87,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                widget.album.album,
+                                widget.genre,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -107,7 +96,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '${widget.album.artist} - ${widget.album.numOfSongs} songs',
+                                '${songs.length} songs',
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 13,
@@ -142,32 +131,67 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   ),
                   SizedBox(height: 20),
                   ...List.generate(
-                    albumSongs.length,
+                    songs.length,
                     (index) {
+                      final song = songs[index];
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 30),
-                        child: SongTile(
-                          onTap: () {
-                            provider.setPlayingList(albumSongs);
-                          },
-                          song: albumSongs[index],
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
                           leading: Container(
+                            decoration: BoxDecoration(
+                              color: UiColors.blue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             height: 50,
                             width: 50,
-                            margin: EdgeInsets.only(right: 5),
-                            decoration: BoxDecoration(
-                              color: UiColors.blue.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: IconButton(
-                              onPressed: null,
-                              icon: Image.asset(
-                                Constants.IMG_DISK,
-                                color: UiColors.blue,
-                                height: 15,
-                              ),
+                            child: QueryArtworkWidget(
+                              keepOldArtwork: true,
+                              artworkBorder: BorderRadius.circular(16),
+                              nullArtworkWidget: CoverArt(art: null),
+                              artworkWidth: double.infinity,
+                              artworkHeight: double.infinity,
+                              id: song.id,
+                              type: ArtworkType.AUDIO,
                             ),
                           ),
+                          title: Text(
+                            song.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            song.artist ?? "Unknown",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          // trailing: selected
+                          //     ? Radio(
+                          //         value: 1,
+                          //         groupValue: 1,
+                          //         onChanged: (v) {
+                          //           setState(() {
+                          //             _selectedSongs.remove(song);
+                          //           });
+                          //         },
+                          //       )
+                          //     : Radio(
+                          //         value: 1,
+                          //         groupValue: 0,
+                          //         onChanged: (v) {
+                          //           setState(() {
+                          //             _selectedSongs.add(song);
+                          //           });
+                          //         },
+                          //       ),
                         ),
                       );
                     },

@@ -17,10 +17,8 @@ class _SongsState extends State<Songs> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     final provider = context.watch<SongProvider>();
     final songs = provider.songs;
-
     return SizedBox(
       height: 500,
       child: ListView.separated(

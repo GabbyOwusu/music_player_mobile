@@ -2,11 +2,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/widgets/coverArt.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
-
-import 'tabs/Songs/song_tile.dart';
 
 class PlayListDetails extends StatefulWidget {
   final Uint8List? art;
@@ -19,20 +18,22 @@ class PlayListDetails extends StatefulWidget {
 }
 
 class _PlayListDetailsState extends State<PlayListDetails> {
-  // late Future<Uint8List?> f;
-
   @override
   void initState() {
     final p = context.read<SongProvider>();
     p.getPlaylistSongs(widget.playlist.id.toString());
-    // f = p.artWork(id: widget.playlist.id, type: ArtworkType.PLAYLIST);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SongProvider>();
-    final albumSongs = provider.playlistSongs;
+    final p = provider.playlistSongs;
+    final albumSongs = provider.songs
+        .where((e) => p.any((element) {
+              return element.title.contains(e.title);
+            }))
+        .toList();
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -53,7 +54,11 @@ class _PlayListDetailsState extends State<PlayListDetails> {
                 background: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(color: Colors.grey),
-                  child: CoverArt(art: widget.art, size: 50),
+                  child: CoverArt(
+                    radius: BorderRadius.circular(0),
+                    art: widget.art,
+                    size: 50,
+                  ),
                 ),
               ),
             ),
@@ -117,9 +122,66 @@ class _PlayListDetailsState extends State<PlayListDetails> {
                   ...List.generate(
                     albumSongs.length,
                     (index) {
+                      final song = albumSongs[index];
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 30),
-                        child: SongTile(song: albumSongs[index]),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              color: UiColors.blue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            height: 50,
+                            width: 50,
+                            child: QueryArtworkWidget(
+                              keepOldArtwork: true,
+                              artworkBorder: BorderRadius.circular(16),
+                              nullArtworkWidget: CoverArt(art: null),
+                              artworkWidth: double.infinity,
+                              artworkHeight: double.infinity,
+                              id: song.id,
+                              type: ArtworkType.AUDIO,
+                            ),
+                          ),
+                          title: Text(
+                            song.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            song.artist ?? "Unknown",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          // trailing: selected
+                          //     ? Radio(
+                          //         value: 1,
+                          //         groupValue: 1,
+                          //         onChanged: (v) {
+                          //           setState(() {
+                          //             _selectedSongs.remove(song);
+                          //           });
+                          //         },
+                          //       )
+                          //     : Radio(
+                          //         value: 1,
+                          //         groupValue: 0,
+                          //         onChanged: (v) {
+                          //           setState(() {
+                          //             _selectedSongs.add(song);
+                          //           });
+                          //         },
+                          //       ),
+                        ),
                       );
                     },
                   ),

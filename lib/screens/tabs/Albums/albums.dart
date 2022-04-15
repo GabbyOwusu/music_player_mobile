@@ -10,13 +10,9 @@ class Albums extends StatefulWidget {
   _AlbumsState createState() => _AlbumsState();
 }
 
-class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
+class _AlbumsState extends State<Albums> {
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final provider = context.watch<SongProvider>();
     final albums = provider.albums;
 
