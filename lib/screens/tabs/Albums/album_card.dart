@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/screens/tabs/Albums/album_details.dart';
 import 'package:music_streaming/widgets/artwork_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -32,9 +32,8 @@ class _AlbumCardState extends State<AlbumCard>
     f = OnAudioQuery().queryArtwork(
       widget.album?.id ?? 0,
       ArtworkType.ALBUM,
-      format: ArtworkFormat.PNG,
-      size: 500,
-      quality: 100,
+      format: ArtworkFormat.JPEG,
+      size: 420,
     );
     if (mounted) art = await f;
   }
@@ -53,12 +52,12 @@ class _AlbumCardState extends State<AlbumCard>
         Navigator.push(
           context,
           CupertinoPageRoute(
-            builder: ((context) {
+            builder: (context) {
               return AlbumDetails(
                 art: art,
                 album: widget.album!,
               );
-            }),
+            },
           ),
         );
       },
@@ -74,6 +73,7 @@ class _AlbumCardState extends State<AlbumCard>
             ),
             child: ArtworkWidget(
               future: f!,
+              keepOldArtwork: true,
               artworkBorder: BorderRadius.circular(16),
               artworkWidth: double.infinity,
               artworkHeight: double.infinity,
