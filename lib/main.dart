@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
 import 'package:music_streaming/screens/splash_screen.dart';
+import 'package:music_streaming/theme/theme.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -18,9 +19,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Music streaming',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: AppTheme.light,
         home: Splash(),
       ),
     );
