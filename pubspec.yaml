@@ -36,6 +36,7 @@ dependencies:
   device_info: ^2.0.3   
   permission_handler: ^8.3.0
   hive: ^2.0.6
+  text_scroll: ^0.0.4
 
 dev_dependencies:
   flutter_test:
