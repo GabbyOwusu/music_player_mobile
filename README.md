@@ -1,4 +1,4 @@
-# music_streaming
+# Tune
 
 A music player built with flutter
 
