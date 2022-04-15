@@ -1,11 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:music_streaming/constants/common.dart';
-import 'package:music_streaming/constants/ui_colors.dart';
+import 'package:music_streaming/constants/constants.dart';
+import 'package:music_streaming/screens/mix_details.dart';
+import 'package:music_streaming/theme/ui_colors.dart';
 import 'package:music_streaming/providers/songs_provider.dart';
+import 'package:music_streaming/screens/CreatePlaylist.dart';
 import 'package:music_streaming/screens/playlist_details.dart';
 import 'package:music_streaming/widgets/coverArt.dart';
+import 'package:music_streaming/widgets/helpers.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +22,22 @@ class Playlist extends StatefulWidget {
 }
 
 class _PlaylistState extends State<Playlist> {
+  List<String> images = [
+    Constants.IMG_GUITAR,
+    Constants.IMG_TAPES,
+    Constants.IMG_CROWD,
+    Constants.IMG_HEADPHONE,
+    Constants.IMG_CROWD,
+  ];
+
+  List<String> genres = [
+    "Gospel",
+    "African music",
+    "Hip-Hop/Rap",
+    "Pop",
+    "R&B",
+  ];
+
   @override
   Widget build(BuildContext context) {
     final p = context.watch<SongProvider>();
@@ -34,7 +53,7 @@ class _PlaylistState extends State<Playlist> {
           icon: Icon(Icons.keyboard_arrow_down, color: Colors.black),
         ),
         title: Text(
-          'Playlists',
+          'Mixes & Playlists',
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -58,7 +77,7 @@ class _PlaylistState extends State<Playlist> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
-                'Created a list of mixes just for you',
+                'A curated list of mixes just for you',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -75,95 +94,203 @@ class _PlaylistState extends State<Playlist> {
                 physics: BouncingScrollPhysics(),
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                itemCount: 4,
+                itemCount: images.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    height: 180,
-                    width: 320,
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Text('45mins'),
+                  return GestureDetector(
+                    onTap: () {
+                      rootNavigator(context).push(
+                        MaterialPageRoute(builder: (context) {
+                          return MixDetails(
+                            genre: genres[index],
+                            art: images[index],
+                          );
+                        }),
+                      );
+                    },
+                    child: Container(
+                      height: 180,
+                      width: 320,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(images[index]),
                         ),
-                        Spacer(),
-                        Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Burna boy,Joey B',
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Level up',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 18,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Burna boy, Joey B',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(0.5),
+                                          blurRadius: 8.0,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                            Spacer(),
-                            playArrow,
-                          ],
-                        )
-                      ],
+                                  SizedBox(height: 5),
+                                  Text(
+                                    '${genres[index]}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(0.5),
+                                          blurRadius: 8.0,
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Spacer(),
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.play_arrow_rounded,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
             ),
-            SizedBox(height: 80),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'Playlist',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+            SizedBox(height: 40),
+            if (playlist.isNotEmpty) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Playlist',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'All your playlists in one place',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     rootNavigator(context).push(
+                    //       MaterialPageRoute(builder: (context) {
+                    //         return CreatePlaylist();
+                    //       }),
+                    //     );
+                    //   },
+                    //   icon: Icon(Icons.add),
+                    // )
+                  ],
                 ),
               ),
-            ),
-            SizedBox(height: 5),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'All your playlists in one place',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                  color: Colors.grey,
+              SizedBox(height: 20),
+              GridView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: playlist.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisExtent: 270,
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 30,
+                  mainAxisSpacing: 20,
                 ),
+                itemBuilder: (context, index) {
+                  return PlayListCard(playlist: playlist[index]);
+                },
               ),
-            ),
-            SizedBox(height: 20),
-            GridView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: playlist.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: 270,
-                crossAxisCount: 2,
-                crossAxisSpacing: 30,
-                mainAxisSpacing: 20,
-              ),
-              itemBuilder: (context, index) {
-                return index == 0
-                    ? createPlayList(ontap: () {})
-                    : PlayListCard(playlist: playlist[index]);
-              },
-            ),
-            SizedBox(height: 30),
+              SizedBox(height: 30),
+            ],
+            if (playlist.isEmpty) ...[
+              SizedBox(height: 50),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "No playlist Added",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Add a new playlist",
+                      style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+                    ),
+                    SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        rootNavigator(context).push(
+                          MaterialPageRoute(builder: (context) {
+                            return CreatePlaylist();
+                          }),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        decoration: BoxDecoration(
+                          color: UiColors.blue,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          "Add playlist",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ]
           ],
         ),
       ),
@@ -237,11 +364,16 @@ class PlayListCard extends StatefulWidget {
 
 class _PlayListCardState extends State<PlayListCard> {
   Uint8List? art;
-  late Future<Uint8List?> f;
+  Future<Uint8List?>? f;
 
   void getArt() async {
-    final p = context.read<SongProvider>();
-    art = await p.artWork(id: widget.playlist.id, type: ArtworkType.PLAYLIST);
+    final p = await OnAudioQuery().queryArtwork(
+      widget.playlist.id,
+      ArtworkType.PLAYLIST,
+      format: ArtworkFormat.PNG,
+      size: 300,
+    );
+    setState(() => art = p);
   }
 
   @override
